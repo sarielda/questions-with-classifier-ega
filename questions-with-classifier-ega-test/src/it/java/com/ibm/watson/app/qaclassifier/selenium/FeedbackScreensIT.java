@@ -111,6 +111,7 @@ public class FeedbackScreensIT {
     			forumButton.isDisplayed());
     	forumButton.click();
     	
+    	CommonFunctions.waitForTabToOpen(driver);
         ArrayList<String> tabs = new ArrayList<String> (driver.getWindowHandles());
         driver.switchTo().window(tabs.get(1)); //Access new tab
         assertThat("After clicking on the forum button, page is redirected",
