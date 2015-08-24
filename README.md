@@ -263,10 +263,10 @@ The methodology for acquiring this data and ensuring that it meets the requireme
 
   3. Generate your own training and answers JSON files.
 
-     A command-line program creates a training JSON file and an answers JSON file that you can use in the previous stages for training the classifier and populating the answer store. In the `com.ibm.watson.app.classifier.tools` package of the `questions-with-classifier-ega-war` project, a class PopulateAnswerStore.java can be run and supplied with the .csv input files.  Use the following command-line parameters for this program:
+     A command-line program creates a training JSON file and an answers JSON file that you can use in the previous stages for training the classifier and populating the answer store. In the `com.ibm.watson.app.qaclassifier.tools` package of the `questions-with-classifier-ega-war` project, a class PopulateAnswerStore.java can be run and supplied with the .csv input files.  Use the following command-line parameters for this program:
 	
 	```
-       usage: java com.ibm.watson.app.classifier.tools.GenerateTrainingAndPopulationData
+       usage: java com.ibm.watson.app.qaclassifier.tools.GenerateTrainingAndPopulationData
         -ain,--answerInput <answerInput>          input csv file containing answers data
         -aout,--answerOutput <answerOutput>       filename and location for the answer store population data
         -qin,--questionInput <questionInput>      input csv file containing questions and labels
