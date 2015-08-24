@@ -125,7 +125,7 @@
         // Perform validation and fire off our event if this text is valid
         if (questionText && self.validateQuestion(questionText)) {
             self.questionValidationError.classList.remove("active");
-            Dispatcher.trigger(routingAction.ASK_QUESTION, { message : questionText });
+            Dispatcher.trigger(action.ASK_QUESTION, { message : questionText });
         }
     }
 

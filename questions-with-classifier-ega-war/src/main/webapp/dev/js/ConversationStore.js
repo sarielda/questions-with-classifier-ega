@@ -1,9 +1,8 @@
 /* Copyright IBM Corp. 2015 Licensed under the Apache License, Version 2.0 */
 
-var riot          = require("riot"),
-    action        = require("./action.js"),
-    routingAction = require("./routingAction.js"),
-    constants     = require("./constants.js");
+var riot      = require("riot"),
+    action    = require("./action.js"),
+    constants = require("./constants.js");
 
 // ConversationStore definition.
 // Flux stores house application logic and state that relate to a specific domain.
@@ -14,13 +13,18 @@ function ConversationStore() {
     var self = this;
 
     self.conversation = {
-        conversationId : "",
-        message        : "",
-        messageId      : "",
-        responses      : [],
-        topQuestions   : []
+        conversationId  : "",
+        message         : "",
+        messageId       : "",
+        responses       : [],
+        topQuestions    : []
     };
-
+    
+    // Question history is kept in chronological order, oldest at index 0.
+    // Question cache format: messageId : {message: "", responses: []}
+    self.questionHistory = [];
+    self.questionCache   = {};
+    
     /**
      * Takes a response and processes its body for a JSON response
      * @param {Object} Server response with a body in JSON format
@@ -76,6 +80,27 @@ function ConversationStore() {
     });
     
 	/**
+	 * Asks a question from the cache and triggers a response event
+     * @param {Object|null} A partial Conversation, with responses, or null if conversation isn't in cache
+	 */
+    self.on(action.UPDATE_REFINEMENT_QUESTIONS, function(question) {
+        
+        var conversation  = null,
+            messageId     = question.messageId,
+            cachedMessage = self.questionCache[messageId];
+    
+        if (messageId && cachedMessage) {
+            // recall from cache
+            conversation                 = {};
+            conversation.responses       = cachedMessage.responses;
+            conversation.messageId       = messageId;
+            conversation.message         = cachedMessage.message;
+        }
+        
+        self.trigger(action.UPDATE_REFINEMENT_QUESTIONS_BROADCAST, conversation);
+    });
+    
+	/**
 	 * Asks a question to the server, updates the local store, triggers a response event
      * @param {String} Question is the question text
 	 */
@@ -83,39 +108,63 @@ function ConversationStore() {
         
         self.trigger(action.ASKING_QUESTION_BROADCAST);
         
-        var requestBody = {};
+        var messageId     = question.messageId,
+            cachedMessage = self.questionCache[messageId];
         
-        if (question.message) {
-            requestBody.message = question.message;
-        }
-
-        if (question.referrer) {
-            requestBody.referrer        = {};
-            requestBody.referrer.source = question.referrer;
-            if (question.referrer === constants.refinementQueryType) {
-                requestBody.referrer.messageId = self.conversation.messageId;
-            }
-        }
-        
-        fetch(constants.conversationUrl + self.conversation.conversationId, {
-            method: "post",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(requestBody)
-        })
-        .then(_analyzeStatus)
-        .then(_parseJson)
-        .then(function(data) {
-            
-            self.conversation.responses = data.responses;
-            self.conversation.messageId = data.messageId;
-            self.conversation.message   = data.message;
+        if (messageId && cachedMessage) {
+        // recall from cache
+            self.conversation.responses       = cachedMessage.responses;
+            self.conversation.messageId       = messageId;
+            self.conversation.message         = cachedMessage.message;
 
             self.trigger(action.ANSWER_RECEIVED_BROADCAST, self.conversation);
             self.trigger(action.ALTERNATIVE_QUESTION_BROADCAST, self.conversation);
-        })
-        .catch(function(error) {
-            self.trigger(action.SERVER_ERROR_BROADCAST, error);
-        });
+        }
+        else {
+        // just kidding, not in our cache
+            var requestBody = {};
+        
+            if (question.message) {
+                requestBody.message = question.message;
+            }
+
+            if (question.referrer) {
+                requestBody.referrer        = {};
+                requestBody.referrer.source = question.referrer;
+                if (question.referrer === constants.refinementQueryType) {
+                    requestBody.referrer.messageId = self.conversation.messageId;
+                }
+            }
+        
+            fetch(constants.conversationUrl + self.conversation.conversationId, {
+                method: "post",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(requestBody)
+            })
+            .then(_analyzeStatus)
+            .then(_parseJson)
+            .then(function(data) {
+
+                // Update the cache
+                var currentMessageId = data.messageId;
+        
+                self.questionHistory.push(currentMessageId);
+                self.questionCache[currentMessageId] = { 
+                    "message"   : data.message, 
+                    "responses" : data.responses
+                };
+                
+                self.conversation.responses       = data.responses;
+                self.conversation.messageId       = data.messageId;
+                self.conversation.message         = data.message;
+
+                self.trigger(action.ANSWER_RECEIVED_BROADCAST, self.conversation);
+                self.trigger(action.ALTERNATIVE_QUESTION_BROADCAST, self.conversation);
+            })
+            .catch(function(error) {
+                self.trigger(action.SERVER_ERROR_BROADCAST, error);
+            });
+        }
     });
     
 	/**

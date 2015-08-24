@@ -43,13 +43,6 @@ else {
   var stringBundleAddress = './strings/en.json';
 }
 
-
-// Routing
-// Clear existing routing callbacks
-
-riot.route.stop();
-riot.route.start();
-
 fetch(stringBundleAddress)
     .then(function(response) {
       if (response.status >= 200 && response.status < 300) {

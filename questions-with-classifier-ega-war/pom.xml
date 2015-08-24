@@ -311,7 +311,7 @@
             <configuration>
               <!-- Incremental build control.  Run gulp when anything in the webapp/dev directory has been modified. -->
               <!--  gulp build is production minified code, where gulp or gulp build_debug is dev code  -->
-              <arguments>build</arguments>
+              <arguments>build_debug</arguments>
               <srcdir>src/main/webapp/dev</srcdir>
             </configuration>
           </execution>

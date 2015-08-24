@@ -42,24 +42,9 @@
             window.scrollTo(0, document.body.scrollHeight);
         }
     });
-
-    askQuestion(e) {
-        Dispatcher.trigger(routingAction.ASK_QUESTION, 
-            {"message" : e.item.answer.canonicalQuestion, "referrer" : constants.refinementQueryType});
-    }
     
-    noneOfTheAbove(e) {
-    	Dispatcher.trigger(action.NONE_OF_THE_ABOVE_CLICKED);
-    	
-    	self.showStillNeedHelp = true;
-        self.noneOfAboveLabel.innerHTML = "<img src=\"images/Badge_88.svg\" class=\"yayIcon\" />" + polyglot.t("thanksForFeedbackMessage");
-        self.noneOfAboveLabel.classList.add("selected");
-        
-        self.update();
-    }
-    
-    Dispatcher.on(action.ANSWER_RECEIVED_BROADCAST, function(conversation) {
-        
+    // Recalculate/update what's being shown on screen depending on confidence and responses
+    _updateAnswers(conversation) {
         var responses = conversation.responses;
         
         var hasAnswers              = responses.length > 0;
@@ -72,11 +57,12 @@
             self.noneOfAboveLabel.classList.remove("selected");
             self.update();
         }
-    });
+    }
     
-    Dispatcher.on(action.ALTERNATIVE_QUESTION_BROADCAST, function(incomingData) {
-        self.responses              = incomingData.responses;
-        self.questionText.innerHTML = "<b>\"" + incomingData.message + "\"</b>";
+    // Update the list of alternative questions
+    _updateAlternativeQuestionsList(conversation) {
+        self.responses              = conversation.responses;
+        self.questionText.innerHTML = "<b>\"" + conversation.message + "\"</b>";
         
         // If there aren't any responses to show, make sure not to crash
         if (self.responses) {
@@ -90,6 +76,37 @@
     
             self.update();
         }
+    }
+
+    askQuestion(e) {
+        Dispatcher.trigger(action.ASK_QUESTION, 
+            {"message" : e.item.answer.canonicalQuestion, "referrer" : constants.refinementQueryType});
+    }
+    
+    noneOfTheAbove(e) {
+    	Dispatcher.trigger(action.NONE_OF_THE_ABOVE_CLICKED);
+    	
+    	self.showStillNeedHelp = true;
+        self.noneOfAboveLabel.innerHTML = "<img src=\"images/Badge_88.svg\" class=\"yayIcon\" />" + polyglot.t("thanksForFeedbackMessage");
+        self.noneOfAboveLabel.classList.add("selected");
+        
+        self.update();
+    }
+    
+    Dispatcher.on(routingAction.STILL_NEED_HELP_BROADCAST, function(conversation) {
+        Dispatcher.trigger(action.UPDATE_REFINEMENT_QUESTIONS, conversation);
+    });
+    
+    Dispatcher.on(action.UPDATE_REFINEMENT_QUESTIONS_BROADCAST, function(conversation) {
+        self._updateAlternativeQuestionsList(conversation);
+    })
+    
+    Dispatcher.on(action.ANSWER_RECEIVED_BROADCAST, function(conversation) {
+        self._updateAnswers(conversation);
+    });
+    
+    Dispatcher.on(action.ALTERNATIVE_QUESTION_BROADCAST, function(conversation) {
+        self._updateAlternativeQuestionsList(conversation);
     });
     
     </script>

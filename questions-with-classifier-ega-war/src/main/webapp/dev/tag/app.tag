@@ -69,49 +69,17 @@
     // Routing
     //----------------------------------------------------------------------------
     
-    /*
-     * Guarantees the requestedFeedback is a proper type
-     * @param {String} Feedback string
-     * @returns {Boolean} True if this is a type of feedback we can give the server, false otherwise
-     */
-    _isProperFeedback(requestedFeedback) {
-        
-        // Only return accepted feedback types, and make sure we don't execute the "still need help" call, since it's a UI
-        // update and not a new question for the server
-        return (requestedFeedback !== constants.needHelpFeedbackType) &&
-               ((requestedFeedback === constants.refinementQueryType) || (requestedFeedback === constants.topQuestionFeedbackType)) ||
-               (!requestedFeedback);
-    }
-    
     Dispatcher.on(action.CONVERSATION_STARTED_BROADCAST, function(conversation) {
         Dispatcher.trigger(routingAction.CONVERSATION_STARTED, conversation.conversationId);
     });
     
-    // Establish our main routing callback to handle the url resolution
-
-    riot.route(function(requestedConversationId, requestedMessageText, requestedFeedback) {
-        
-        // Load the home page if we're only getting a conversationId
-        if (requestedConversationId && !requestedMessageText && !requestedFeedback) {
-            Dispatcher.trigger(routingAction.SHOW_HOME_PAGE);
-        }
-        
-        // If it's a refinement, we'll handle that elsewhere since we're not showing a simple answer
-        if (requestedMessageText && self._isProperFeedback(requestedFeedback)) {
-            
-            // Don't send a referrer object if we have none
-            var messagePayload     = {};
-            messagePayload.message = decodeURIComponent(requestedMessageText);
-            
-            if (requestedFeedback) {
-                messagePayload.referrer = requestedFeedback;
-            }
-            
-            // Fire off our question
-            Dispatcher.trigger(action.ASK_QUESTION, messagePayload);
-        }
+    Dispatcher.on(action.ANSWER_RECEIVED_BROADCAST, function(conversation) {
+        Dispatcher.trigger(routingAction.ANSWER_RECEIVED, conversation)
     });
     
+    Dispatcher.on(routingAction.ASK_QUESTION_BROADCAST, function(conversation) {
+        Dispatcher.trigger(action.ASK_QUESTION, conversation);
+    });
     
     // Initiate a conversation when the app is mounted
     self.on("mount", function() {

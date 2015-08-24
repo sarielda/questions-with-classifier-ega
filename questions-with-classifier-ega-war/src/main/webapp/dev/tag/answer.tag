@@ -44,12 +44,5 @@
             self.showAnswer = false; 
         });
         
-        // The user has selected "None of the above" for a low confidence answer
-        Dispatcher.on(action.NONE_OF_THE_ABOVE_CLICKED_BROADCAST, function() {
-        	self.showAnswer = false;
-        	self.showQuestionUnanswerable = true;
-        	self.update();
-        });
-        
     </script>
 </answer>

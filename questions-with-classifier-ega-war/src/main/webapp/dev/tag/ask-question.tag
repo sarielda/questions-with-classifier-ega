@@ -18,16 +18,12 @@
         self.update();
     });
 
-    // Handle the routing if we're showing a refinement
-    riot.route(function(requestedConversationId, requestedMessageText, requestedFeedback) {
-        
-        // If it's a refinement, we'll handle that elsewhere since we're not showing a simple answer
-        if (requestedConversationId && requestedFeedback === constants.needHelpFeedbackType) {
-            self.showAnswer           = false;
-            self.showUnhappyContainer = true;
-            self.update();
-        }
+    Dispatcher.on(routingAction.STILL_NEED_HELP_BROADCAST, function(conversation) {
+        self.showAnswer           = false;
+        self.showUnhappyContainer = true;
+        self.update();
     });
+    
     
     Dispatcher.on(routingAction.SHOW_HOME_PAGE_BROADCAST, function() {
         self.showAnswer           = true;
@@ -38,15 +34,7 @@
     
     // When we've received negative feedback
     Dispatcher.on(action.NEGATIVE_FEEDBACK_RECEIVED_BROADCAST, function() {
-        
-        // Do an in-place swap of the URL
-        riot.route.exec(function(requestedConversationId, requestedMessageText, requestedFeedback) {
-            
-            // Tack on REFINEMENT to the feedback section of the url
-            Dispatcher.trigger(routingAction.REFINEMENT_REQUESTED, 
-                { conversationId : requestedConversationId, message : requestedMessageText, referrer : constants.needHelpFeedbackType }
-            );
-        });
+        Dispatcher.trigger(routingAction.REFINEMENT_REQUESTED);
         
         self.showAnswer           = false;
         self.showUnhappyContainer = true;
