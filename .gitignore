@@ -9,3 +9,4 @@ questions-with-classifier-ega-war/src/main/webapp/css
 **/.DS_Store
 *.log
 .settings
+.classpath
