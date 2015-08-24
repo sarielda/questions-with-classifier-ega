@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.rules.ExternalResource;
+import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -107,17 +108,21 @@ public class SeleniumTestRunner extends BlockJUnit4ClassRunner {
     
     @Override
     protected List<TestRule> getTestRules(Object target) {
-        List<TestRule> rules = super.getTestRules(target);
-        
         // Load the app and potentially skip the welcome screen
-        rules.add(new SkipWelcomeScreenRule(driverRef, env, getTestClass().getAnnotation(SeleniumConfig.class)));
-        
+        TestRule skipWelcomeScreen = new SkipWelcomeScreenRule(driverRef, env, getTestClass().getAnnotation(SeleniumConfig.class));
+
         // Take a screenshot after each test
-        rules.add(new ScreenshotRule(driverRef));
-        
+        TestRule takeScreenshot = new ScreenshotRule(driverRef);
+
         // Retry any tests that fail
-        rules.add(new RetryRule(driverRef));
-        
+        TestRule retryFailures = new RetryRule(driverRef);
+
+        List<TestRule> rules = super.getTestRules(target);
+
+        RuleChain chain = RuleChain.outerRule(skipWelcomeScreen)
+                .around(retryFailures)
+                .around(takeScreenshot);
+        rules.add(chain);
         return rules;
     }
     

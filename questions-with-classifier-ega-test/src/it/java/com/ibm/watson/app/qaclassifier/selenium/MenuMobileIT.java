@@ -20,7 +20,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
@@ -99,15 +98,10 @@ public class MenuMobileIT {
         documentationOption.click();
         
         //New tab with documentation is opened
-        CommonFunctions.waitForTabToOpen(driver);
-        ArrayList<String> tabs = new ArrayList<String> (driver.getWindowHandles()); //Get all existing tabs
-        driver.switchTo().window(tabs.get(1)); //Access new tab
-        
+        CommonFunctions.switchTabs(driver);
         assertThat("After clicking on the menu option, page is redirected",
         		driver.getTitle(), is("Natural Language Classifier service documentation | Watson Developer Cloud"));
-        
         driver.close();
-        driver.switchTo().window(tabs.get(0));
     }
     
 }

@@ -16,6 +16,9 @@
 
 package com.ibm.watson.app.qaclassifier.selenium;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertThat;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.WebDriver;
@@ -113,14 +116,29 @@ public class CommonFunctions {
     	return driver.findElement(By.className("visitForum"));
     }
     
-	public static void waitForTabToOpen(WebDriver driver) {
-		new WebDriverWait(driver, 2).until(new Predicate<WebDriver>() {
-			@Override
-			public boolean apply(WebDriver input) {
-				return input.getWindowHandles().size() == 2;
-			}
-		});
-	}
+    public static void switchTabs(WebDriver driver) {
+        String currentHandle = driver.getWindowHandle();
+
+        new WebDriverWait(driver, 2).until(new Predicate<WebDriver>() {
+            @Override
+            public boolean apply(WebDriver input) {
+                return input.getWindowHandles().size() > 1;
+            }
+
+            @Override
+            public String toString() {
+                return "tab to open";
+            }
+        });
+
+        assertThat("Expected to find two browser tabs", driver.getWindowHandles(), hasSize(2));
+
+        for (String handle : driver.getWindowHandles()) {
+            if (!handle.equals(currentHandle)) {
+                driver.switchTo().window(handle);
+            }
+        }
+    }
 
     private static void waitForAnswer(WebDriver driver) {
         // We know that an answer has been returned when the answer tag has a child element.

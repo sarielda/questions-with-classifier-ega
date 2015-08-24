@@ -21,8 +21,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -111,15 +109,12 @@ public class FeedbackScreensIT {
     			forumButton.isDisplayed());
     	forumButton.click();
     	
-    	CommonFunctions.waitForTabToOpen(driver);
-        ArrayList<String> tabs = new ArrayList<String> (driver.getWindowHandles());
-        driver.switchTo().window(tabs.get(1)); //Access new tab
+    	CommonFunctions.switchTabs(driver);
         assertThat("After clicking on the forum button, page is redirected",
         		driver.getTitle(), is("natural-language-classifier - dWAnswers"));
         
         driver.close();
-        driver.switchTo().window(tabs.get(0));
-        
+
         // Can't verify that the feedback was logged, but the log scans will catch any errors.
     }
 
