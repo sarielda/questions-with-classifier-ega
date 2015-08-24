@@ -1,5 +1,5 @@
 # Questions on the Natural Language Classifier Application Overview
-The Questions on the Natural Language Classifier Application uses the Watson Natural Language Classifier Service to show how to build a question-and-answer application that uses minimal ground truth and to demonstrate some best practices for using the service.
+The Questions on the Natural Language Classifier Application uses the Watson Natural Language Classifier Service to show how to build a question-and-answer application that uses a small amount of training data and to demonstrate some best practices for using the service.
 
 To function correctly this application requires the following items:
 
@@ -23,7 +23,7 @@ Ensure that you have the following prerequisites before you start:
 ## Stages
 To get started, complete each of the following stages in order:
   1. [Clone the app project, build it, and deploy to Bluemix](#stage-1-clone-build-and-deploy)
-  2. [Determine the data you want to use](#stage-2-determine-the-data-you-want-to-use)
+  2. [Choose which data you want to use](#stage-2-choose-which-data-you-want-to-use)
   3. [Train the classifier](#stage-3-train-the-classifier)
   4. [Populate the answer store](#stage-4-populate-the-answer-store)
 
@@ -31,18 +31,18 @@ To get started, complete each of the following stages in order:
 ### Stage 1: Clone, build, and deploy
 [![Deploy to Bluemix](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?repository=https://github.com/watson-developer-cloud/questions-with-classifier-ega)
 
-Clicking this button will perform the following steps automatically:
+Clicking the **Deploy to Bluemix** button does the following steps automatically:
 
-1. Prompts you to log in to Bluemix, or to create an account
-2. Creates a Bluemix DevOps Services project and initializes a new Git repository
-3. Clones the questions-with-classifier-ega project into the Git repository
-4. Builds the project
-5. Creates any required Bluemix services
-6. Deploys the app to Bluemix
+1. Prompts you to log in to Bluemix or to create an account.
+2. Creates a Bluemix DevOps Services project and initializes a new Git repository.
+3. Clones the questions-with-classifier-ega project into the Git repository.
+4. Builds the project.
+5. Creates any required Bluemix services.
+6. Deploys the app to Bluemix.
 
-The DevOps Services project will be set up to automatically deploy changes to Bluemix when you commit new changes to your git repository.
+The DevOps Services project is set up to automatically deploy changes to Bluemix after you commit new changes to your Git repository.
 
-The entire process will take a few minutes to complete.  Even though the app is deployed at this point, you still need to follow the steps below before the app will function correctly.
+The entire process lasts a few minutes. Although the app is deployed when the process is finished, you must complete the following stages to ensure that the app functions correctly.
 
 ### Stage 2: Choose which data you want to use
 In this stage, understand the types of data that the app requires and choose whether you want to use sample data or your own data. 
@@ -68,7 +68,7 @@ To use your own data instead of the sample data, see [Prepare your own data for 
 ### Stage 3: Train the classifier
 In this stage, train the classifier by using curl. To train the classifier in Eclipse, see [Training the classifier in Eclipse](#training-the-classifier-in-eclipse).
 
-For more information about training the classifier, see the [Classifier API](https://watson.stage1.mybluemix.net/apis/#!/natural-language-classifier).
+For more information about training the classifier, see the [Classifier API](https://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/apis/#!/natural-language-classifier).
 
   1. [Log in to Bluemix](https://console.ng.bluemix.net/) and navigate to your app.
   2. Click **Show Credentials** for the Natural Language Classifier service that is bound to your app.
@@ -85,8 +85,8 @@ In this stage, populate the answer store by using curl. To populate the answer s
 To see the API that populates the answer store, open https://yourAppName.mybluemix.net/api, and see **Manage**.
 
   1. Ensure that your app is running. If it's not running, open your app in Bluemix and click **START**.
-  2. Ensure that your answers.json file matches your training.json file.
-  3. From a command prompt, run the following curl command. The answers.json file is assumed to be in the directory from which you run the command. If necessary, change the path to the file.
+  2. Ensure that your `answers.json` file matches your `training.json` file.
+  3. From a command prompt, run the following curl command. The `answers.json` file is assumed to be in the directory from which you run the command. If necessary, change the path to the file.
 
     `curl -X POST -H "Content-Type: application/json" -d @answers.json http://yourAppName.mybluemix.net/api/v1/manage/answer`
 
@@ -101,7 +101,7 @@ To see the API that populates the answer store, open https://yourAppName.mybluem
 Use the following information to use Eclipse for training the classifier and populating the answer store and to train a classifier on your own data.
 
 ### Cloning and building the project yourself
-  If you don't want to use the "Deploy to Bluemix" button, you can clone and build the project yourself.
+  If you don't want to use the **Deploy to Bluemix** button, you can clone and build the project yourself by completing the following steps:
   
   1. Clone the framework-ega repository by issuing one of the following commands:
      ```
@@ -124,12 +124,10 @@ Use the following information to use Eclipse for training the classifier and pop
 
   The `questions-with-classifier-ega-war.war` file is in the `/questions-with-classifier-ega/questions-with-classifier-ega-war/target` directory.
 
-**Note: Once in public github the framework-ega dependencies will be in maven central and step #1 and #2 will no longer be necessary**
-
 ***
 
 ### Manually creating Bluemix services and deploying to Bluemix
-In this stage, create your application in Bluemix, bind the necessary services to it, and deploy the application code that you built in Stage 1.
+In this stage, manually create your application in Bluemix, bind the necessary services to it, and deploy the application code that you built in Stage 1.
   1. [Log in to Bluemix](https://console.ng.bluemix.net/) and navigate to the Dashboard.
   2. Create your app.
 	  1. Click **CREATE AN APP**.
@@ -158,7 +156,7 @@ In this stage, create your application in Bluemix, bind the necessary services t
 	  3. Click **RESTAGE** to restage your app.
   6. Deploy the application code that you built in Stage 1 by using the Cloud Foundry commands.
       1. Open the Command Prompt.
-      2. Navigate to the directory that contains the WAR file you that you generated in Stage 1 by running the following command:
+      2. Navigate to the directory that contains the WAR file you that you generated in the previous section by running the following command:
       
         ```
         cd /questions-with-classifier-ega/questions-with-classifier-ega-war/target

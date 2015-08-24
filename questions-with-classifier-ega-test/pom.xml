@@ -116,6 +116,31 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.codehaus.gmaven</groupId>
+        <artifactId>gmaven-plugin</artifactId>
+        <version>1.5</version>
+        <configuration>
+          <providerSelection>2.0</providerSelection>
+        </configuration>
+        <executions>
+          <execution>
+            <id>set-jvm-properties</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <source>
+                // Prevent REST Assured JVM crashes with IBM JDK
+                if (System.properties['java.vm.vendor'] == 'IBM Corporation') {
+                  pom.properties['failsafe.argLine'] = '-Xsoftrefthreshold0 -Xalwaysclassgc'
+                }
+              </source>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <!-- Liberty plugin for running integration tests without deploying 
           to Bluemix. Installs Liberty if it doesn't already exist, creates a server 
           if it doesn't already exist, starts the server and deploys the app, and stops 
@@ -136,6 +161,7 @@
           <configuration>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
             <skipITs>${skipITs}</skipITs>
+            <argLine>${failsafe.argLine}</argLine>
           </configuration>
         </plugin>
       </plugins>
@@ -206,7 +232,7 @@
               <!-- Database: 1) Copy derby JARs to target dir, these are referenced as a JDBC driver in the Liberty server.xml -->
               <execution>
                 <id>copy-derby-jars</id>
-                <phase>package</phase>
+                <phase>pre-integration-test</phase>
                 <goals>
                   <goal>copy</goal>
                 </goals>
@@ -235,7 +261,7 @@
               <!-- Database: 2) Unpack entities so they can be enhanced -->
               <execution>
                 <id>unpack.entities</id>
-                <phase>process-sources</phase>
+                <phase>pre-integration-test</phase>
                 <goals>
                   <goal>unpack</goal>
                 </goals>
@@ -256,7 +282,7 @@
               </execution>
               <execution>
                 <id>copy-war-to-deploy-to-liberty</id>
-                <phase>package</phase>
+                <phase>pre-integration-test</phase>
                 <goals>
                   <goal>copy</goal>
                 </goals>
@@ -288,7 +314,7 @@
             <executions>
               <execution>
                 <id>enhancer</id>
-                <phase>process-classes</phase>
+                <phase>pre-integration-test</phase>
                   <goals>
                   <goal>enhance</goal>
                 </goals>
@@ -306,7 +332,6 @@
           <plugin>
             <groupId>org.codehaus.gmaven</groupId>
             <artifactId>gmaven-plugin</artifactId>
-            <version>1.5</version>
             <configuration>
               <providerSelection>2.0</providerSelection>
             </configuration>
