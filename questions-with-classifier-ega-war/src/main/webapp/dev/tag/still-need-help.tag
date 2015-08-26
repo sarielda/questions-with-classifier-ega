@@ -19,21 +19,27 @@
 	
 	<script>
     
-    var self   = this,
-        action = require("./action.js");
-    this.stillNeedHelpTitle = polyglot.t("stillNeedHelpTitle"),
-    this.explanation.innerHTML = polyglot.t("stillNeedHelpTextHTML"),
-    this.tipsTitle = polyglot.t("stillNeedHelpTipsTitle"),
-    this.buttonLabel = polyglot.t("stillNEeedHelpButton");
+    var self          = this,
+        action        = require("./action.js"),
+        routingAction = require("./routingAction.js");
+        
+    // String translations
+    self.messageId             = null;
+    self.stillNeedHelpTitle    = polyglot.t("stillNeedHelpTitle"),
+    self.explanation.innerHTML = polyglot.t("stillNeedHelpTextHTML"),
+    self.tipsTitle             = polyglot.t("stillNeedHelpTipsTitle"),
+    self.buttonLabel           = polyglot.t("stillNEeedHelpButton");
 	self.tips = [
 	    polyglot.t("stillNeedHelpTips-1"),
 	    polyglot.t("stillNeedHelpTips-2")
 	];
-	
+    
 	launchForum(e) {
         // Handle our own event with a server call to the Feedback API
-        Dispatcher.trigger(action.FORUM_BUTTON_PRESSED);
-		window.open("https://developer.ibm.com/answers/topics/natural-language-classifier/");
+        Dispatcher.trigger(routingAction.GET_CURRENT_MESSAGEID, function(messageId) {
+            Dispatcher.trigger(action.FORUM_BUTTON_PRESSED, messageId);
+    		window.open("https://developer.ibm.com/answers/topics/natural-language-classifier/");
+        }.bind(self));
 	}
 	
 	</script>

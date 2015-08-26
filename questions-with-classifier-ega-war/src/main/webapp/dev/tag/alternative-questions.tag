@@ -99,7 +99,7 @@
     
     Dispatcher.on(action.UPDATE_REFINEMENT_QUESTIONS_BROADCAST, function(conversation) {
         self._updateAlternativeQuestionsList(conversation);
-    })
+    });
     
     Dispatcher.on(action.ANSWER_RECEIVED_BROADCAST, function(conversation) {
         self._updateAnswers(conversation);

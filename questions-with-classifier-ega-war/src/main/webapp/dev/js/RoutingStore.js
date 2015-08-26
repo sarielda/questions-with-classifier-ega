@@ -139,6 +139,16 @@ function RoutingStore() {
         // Note:  This will replace an older conversationId with the newest, current one
         self._urlifyConversation();
     });
+    
+    /*
+     * Parse the URL for the current messageId
+     */
+    self.on(routingAction.GET_CURRENT_MESSAGEID, function(callback) {
+        riot.route.exec(function(requestedConversationId, requestedMessageText, requestedMessageId) {
+            callback(requestedMessageId);
+            self.trigger(routingAction.GET_CURRENT_MESSAGEID_BROADCAST, requestedMessageId);
+        }.bind(self));
+    });
 }
 
 if (typeof(module) !== 'undefined') module.exports = RoutingStore;

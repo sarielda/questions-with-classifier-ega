@@ -20,6 +20,7 @@ var action = {
     "POSITIVE_FEEDBACK_RECEIVED_BROADCAST"  : "positive_feedback_was_processed_by_the_server",
     "QUESTION_RECEIVED"                     : "question_response_has_been_received_from_server",
     "SERVER_ERROR_BROADCAST"                : "a_server_error_has_occurred",
+    "SET_CURRENT_QUESTION"                  : "set_the_current_question_being_shown",
     "SET_VISIT_LEVEL"                       : "set_visit_level",
     "SHOW_MENU_OVERLAY"                     : "show_menu_overlay",
     "SHOW_MENU_OVERLAY_BROADCAST"           : "show_menu_overlay_broadcast",

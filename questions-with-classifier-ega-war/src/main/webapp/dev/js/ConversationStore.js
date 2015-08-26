@@ -1,8 +1,9 @@
 /* Copyright IBM Corp. 2015 Licensed under the Apache License, Version 2.0 */
 
-var riot      = require("riot"),
-    action    = require("./action.js"),
-    constants = require("./constants.js");
+var riot          = require("riot"),
+    action        = require("./action.js"),
+    routingAction = require("./routingAction.js"),
+    constants     = require("./constants.js");
 
 // ConversationStore definition.
 // Flux stores house application logic and state that relate to a specific domain.
@@ -80,27 +81,6 @@ function ConversationStore() {
     });
     
 	/**
-	 * Asks a question from the cache and triggers a response event
-     * @param {Object|null} A partial Conversation, with responses, or null if conversation isn't in cache
-	 */
-    self.on(action.UPDATE_REFINEMENT_QUESTIONS, function(question) {
-        
-        var conversation  = null,
-            messageId     = question.messageId,
-            cachedMessage = self.questionCache[messageId];
-    
-        if (messageId && cachedMessage) {
-            // recall from cache
-            conversation                 = {};
-            conversation.responses       = cachedMessage.responses;
-            conversation.messageId       = messageId;
-            conversation.message         = cachedMessage.message;
-        }
-        
-        self.trigger(action.UPDATE_REFINEMENT_QUESTIONS_BROADCAST, conversation);
-    });
-    
-	/**
 	 * Asks a question to the server, updates the local store, triggers a response event
      * @param {String} Question is the question text
 	 */
@@ -144,12 +124,12 @@ function ConversationStore() {
             .then(_analyzeStatus)
             .then(_parseJson)
             .then(function(data) {
-
+            
                 // Update the cache
-                var currentMessageId = data.messageId;
+                var oldMessageId = data.messageId;
         
-                self.questionHistory.push(currentMessageId);
-                self.questionCache[currentMessageId] = { 
+                self.questionHistory.push(oldMessageId);
+                self.questionCache[oldMessageId] = { 
                     "message"   : data.message, 
                     "responses" : data.responses
                 };
@@ -158,7 +138,7 @@ function ConversationStore() {
                 self.conversation.messageId       = data.messageId;
                 self.conversation.message         = data.message;
 
-                self.trigger(action.ANSWER_RECEIVED_BROADCAST, self.conversation);
+                self.trigger(action.ANSWER_RECEIVED_BROADCAST,      self.conversation);
                 self.trigger(action.ALTERNATIVE_QUESTION_BROADCAST, self.conversation);
             })
             .catch(function(error) {
@@ -254,10 +234,14 @@ function ConversationStore() {
     /**
      * The user clicked on something to open up the forum in a new tab
      */
-    self.on(action.FORUM_BUTTON_PRESSED, function() {
+    self.on(action.FORUM_BUTTON_PRESSED, function(messageId) {
+        
+        // if we're given a messageId, it means the user is responding to a cached answer.
+        var postMessageId = messageId ? messageId : self.conversation.messageId;
+        
         var postData = {
                 "conversationId": self.conversation.conversationId,
-                "messageId": self.conversation.messageId,
+                "messageId": postMessageId,
                 "action": "FORUM_REDIRECT" 
         };
         
@@ -274,6 +258,43 @@ function ConversationStore() {
         .catch(function(error) {
             self.trigger(action.SERVER_ERROR_BROADCAST, error);
         });
+    });
+    
+    /**
+     * Set the current question to the one provided
+     */
+    self.on(action.SET_CURRENT_QUESTION, function(question) {
+        
+        var messageId     = question.messageId,
+            cachedMessage = self.questionCache[messageId];
+    
+        if (messageId && cachedMessage) {
+        // recall from cache
+            self.conversation.responses       = cachedMessage.responses;
+            self.conversation.messageId       = messageId;
+            self.conversation.message         = cachedMessage.message;
+        }
+    });
+    
+    /**
+     * Gets the conversation for the given questionId from cache
+     * @param {Object} {question: (required)questionId}
+     */
+    self.on(action.UPDATE_REFINEMENT_QUESTIONS, function(question) {
+        
+        var conversation  = null,
+            messageId     = question.messageId,
+            cachedMessage = self.questionCache[messageId];
+    
+        if (messageId && cachedMessage) {
+        // recall from cache
+            conversation           = {};
+            conversation.responses = cachedMessage.responses;
+            conversation.messageId = messageId;
+            conversation.message   = cachedMessage.message;
+
+            self.trigger(action.UPDATE_REFINEMENT_QUESTIONS_BROADCAST, conversation);
+        }
     });
 
 	/**

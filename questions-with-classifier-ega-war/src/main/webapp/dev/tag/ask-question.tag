@@ -19,11 +19,12 @@
     });
 
     Dispatcher.on(routingAction.STILL_NEED_HELP_BROADCAST, function(conversation) {
+        Dispatcher.trigger(action.SET_CURRENT_QUESTION, conversation);
+        
         self.showAnswer           = false;
         self.showUnhappyContainer = true;
         self.update();
     });
-    
     
     Dispatcher.on(routingAction.SHOW_HOME_PAGE_BROADCAST, function() {
         self.showAnswer           = true;
