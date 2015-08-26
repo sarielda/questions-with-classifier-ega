@@ -68,7 +68,7 @@ public class HomePageIT {
         CommonFunctions.askQuestionViaTextInputExpectingError(driver, "     ");
         WebElement errorText = driver.findElement(By.id("questionValidationError"));
         assertTrue("Error message was not displayed after asking an invalid question", errorText.isDisplayed());
-        assertThat("Incorrect error message", errorText.getText(), is("A question must contain at least one word"));
+        assertThat("Incorrect error message", errorText.getText(), containsString("A question must contain at least one word"));
     }
 
     private String getDisplayedQuestionText() {

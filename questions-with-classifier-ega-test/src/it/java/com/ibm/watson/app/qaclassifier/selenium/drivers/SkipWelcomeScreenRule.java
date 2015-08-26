@@ -70,7 +70,17 @@ public class SkipWelcomeScreenRule extends ExternalResource {
             CommonFunctions.waitForApp(driver);
         }
     }
-    
+
+    @Override
+    protected void after() {
+        // Clean up any extra open tabs.
+        WebDriver driver = driverRef.get();
+        while (driver.getWindowHandles().size() > 1) {
+            driver.close();
+        }
+        driver.switchTo().window(driver.getWindowHandles().iterator().next());
+    }
+
     private void skipWelcomeScreen() throws InterruptedException {
         WebDriver driver = driverRef.get();
         // In some cases on Internet Explorer it can take more than five seconds for this to appear.

@@ -20,8 +20,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -76,15 +74,10 @@ public class HighLowConfidenceAnswersIT {
                 visitForumButtonFound());
         
         CommonFunctions.findVisitTheForumButton(driver).click();
-
-        CommonFunctions.waitForTabToOpen(driver);
-        ArrayList<String> tabs = new ArrayList<String> (driver.getWindowHandles());
-        driver.switchTo().window(tabs.get(1));
+        CommonFunctions.switchTabs(driver);
         assertThat("After clicking on the forum button, page is redirected",
         		driver.getTitle(), is("natural-language-classifier - dWAnswers"));
-        
         driver.close();
-        driver.switchTo().window(tabs.get(0));
     }
 
     private String getDisplayedQuestionText() {
