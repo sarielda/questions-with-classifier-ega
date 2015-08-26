@@ -9,10 +9,19 @@
 	
 	<script>
     
-	var self           = this,
-	action             = require("./action.js");
-	this.showMenuList  = true,
-	this.menuLabel     = polyglot.t("menu");
+	var self              = this,
+	    action            = require("./action.js"),
+        routingAction     = require("./routingAction.js");
+        
+	self.showMenuList = true,
+	self.menuLabel    = polyglot.t("menu");
+
+    hideMenu() {  
+        self.menuIconContainerDesktop.classList.remove("active");
+		document.querySelector(".close-menu-overlay").classList.remove("hidden");
+		document.querySelector("menu-list").classList.remove("active");
+		document.querySelector("body").classList.remove("push-toleft");
+    }
 
     toggleMenu() {
         self.menuIconContainerDesktop.classList.toggle("active");
@@ -22,8 +31,12 @@
 		setTimeout(function(){ 
 			document.querySelector(".menu-options").classList.add("visible");
 			document.querySelector(".menu-content").classList.remove("active");
-		}, 400);
+		}, 200);
     }
+    
+    Dispatcher.on(routingAction.SHOW_HOME_PAGE_BROADCAST, function() {
+        self.hideMenu(); 
+    });
     
 	</script>
 </custom-menu>

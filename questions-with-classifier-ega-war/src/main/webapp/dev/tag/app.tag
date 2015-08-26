@@ -69,10 +69,6 @@
     // Routing
     //----------------------------------------------------------------------------
     
-    Dispatcher.on(action.CONVERSATION_STARTED_BROADCAST, function(conversation) {
-        Dispatcher.trigger(routingAction.CONVERSATION_STARTED, conversation.conversationId);
-    });
-    
     Dispatcher.on(action.ANSWER_RECEIVED_BROADCAST, function(conversation) {
         Dispatcher.trigger(routingAction.ANSWER_RECEIVED, conversation)
     });

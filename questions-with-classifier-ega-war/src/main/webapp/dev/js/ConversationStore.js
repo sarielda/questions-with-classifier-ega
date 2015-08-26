@@ -97,7 +97,7 @@ function ConversationStore() {
             self.conversation.messageId       = messageId;
             self.conversation.message         = cachedMessage.message;
 
-            self.trigger(action.ANSWER_RECEIVED_BROADCAST, self.conversation);
+            self.trigger(action.ANSWER_RECEIVED_BROADCAST,      self.conversation);
             self.trigger(action.ALTERNATIVE_QUESTION_BROADCAST, self.conversation);
         }
         else {

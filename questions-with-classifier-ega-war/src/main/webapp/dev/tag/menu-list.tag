@@ -13,15 +13,16 @@
         <p id="menuContent" class="menu-text"></p>
     </div> 
 	<script>
-    var self   = this,
-    action = require("./action.js");
+    var self          = this,
+        action        = require("./action.js"),
+        routingAction = require("./routingAction.js");
     
     self.menuOptions = [
       {
           id: "home",
           title: polyglot.t("menu-home"),
           action: function() {
-              location.reload();
+              Dispatcher.trigger(routingAction.SHOW_HOME_PAGE);
           }
       },
       {
