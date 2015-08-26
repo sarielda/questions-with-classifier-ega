@@ -10,6 +10,7 @@ function RoutingStore() {
     
     var self = this;
 
+    self._currentConversationId    = null;
     self._internalQuestionWasAsked = false;
     
     /*
@@ -64,7 +65,7 @@ function RoutingStore() {
     // Establish our main routing callback to handle the url resolution
     riot.route(function(requestedConversationId, requestedMessageText, requestedMessageId, requestedFeedback) {
         
-        if (!requestedConversationId || !requestedMessageText) {
+        if (!requestedConversationId || !requestedMessageText || (requestedConversationId !== self._currentConversationId)) {
             self._goHome();
         }
         if (requestedConversationId && requestedMessageText) {
@@ -90,7 +91,10 @@ function RoutingStore() {
      * @param {Object} An object with: (required)conversationId, (required)message, (optional)messageId, (optional)referrer
      */ 
     self.on(routingAction.ANSWER_RECEIVED, function(questionPayload) {
-
+        
+        // This is definitely from the server, so we can trust it's accurate
+        self._currentConversationId = questionPayload.conversationId;
+        
         // Build the routing string and update the browser URL
         self._internalQuestionWasAsked = true;
         self._urlify(questionPayload);
