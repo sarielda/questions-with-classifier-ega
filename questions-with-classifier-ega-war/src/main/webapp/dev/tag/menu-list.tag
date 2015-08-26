@@ -9,7 +9,7 @@
         <powered-by class="poweredBy-menu"></powered-by>
     </ul>
     <div class="menu-content">
-        <a class="menu-title" href="#"  onmousedown={ backClicked }>{menu.title}</a>
+        <div class="menu-title" onmousedown={ backClicked }>{menu.title}</div>
         <p id="menuContent" class="menu-text"></p>
     </div> 
 	<script>
