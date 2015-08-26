@@ -8,8 +8,9 @@
 
     <script>
     
-    var action     = require("./action.js"),
-        self       = this;
+    var action        = require("./action.js"),
+        constants     = require("./constants.js"),
+        self          = this;
     
     self.on("mount", function() {
         Dispatcher.trigger(action.GET_TOP_QUESTIONS);
@@ -22,7 +23,7 @@
     });
 
     askTopQuestion(e) {
-        Dispatcher.trigger(action.ASK_QUESTION, {"message" : e.item.question.questionText, "referrer" : "TOP_QUESTION"});
+        Dispatcher.trigger(action.ASK_QUESTION, {"message" : e.item.question.questionText, "referrer" : constants.topQuestionFeedbackType});
     }
     
     </script>

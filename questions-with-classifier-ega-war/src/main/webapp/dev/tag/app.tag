@@ -8,14 +8,20 @@
     
     <script>
     
-    var action    = require("./action.js"),
-        constants = require("./constants.js"),
-        self      = this;
+    var action        = require("./action.js"),
+        routingAction = require("./routingAction.js"),
+        constants     = require("./constants.js"),
+        riot          = require("riot"),
+        self          = this;
     
-    self.showWelcome     = false;
-    self.showHome        = false;
-    self.showUnavailable = false;
-    self.showMenu        = false;
+    self.showWelcome         = false;
+    self.showHome            = false;
+    self.showUnavailable     = false;
+    self.showMenu            = false;
+    
+    // Routing control variables
+    self.isValidConversation = false;
+    self.isValidMessage      = false;
     
     hideWelcomeScreen = function() {
         self.showWelcome = false;
@@ -57,6 +63,18 @@
         self.showWelcome     = false;
         self.showHome        = false;
         self.update();
+    });
+    
+    //----------------------------------------------------------------------------
+    // Routing
+    //----------------------------------------------------------------------------
+    
+    Dispatcher.on(action.ANSWER_RECEIVED_BROADCAST, function(conversation) {
+        Dispatcher.trigger(routingAction.ANSWER_RECEIVED, conversation)
+    });
+    
+    Dispatcher.on(routingAction.ASK_QUESTION_BROADCAST, function(conversation) {
+        Dispatcher.trigger(action.ASK_QUESTION, conversation);
     });
     
     // Initiate a conversation when the app is mounted

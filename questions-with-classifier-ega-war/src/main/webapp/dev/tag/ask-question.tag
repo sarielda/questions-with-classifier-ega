@@ -6,8 +6,10 @@
     <question-input name="questionInputTag" class="question-input-container noAnswer" initialviewing=true></question-input>
     
     <script>
-    var action    = require("./action.js"),
-        self      = this;
+    var action        = require("./action.js"),
+        routingAction = require("./routingAction.js"),
+        constants     = require("./constants.js"),
+        self          = this;
     
     // Initially, don't show answers to questions we haven't asked yet
     self.on("mount", function() {
@@ -16,8 +18,25 @@
         self.update();
     });
 
+    Dispatcher.on(routingAction.STILL_NEED_HELP_BROADCAST, function(conversation) {
+        Dispatcher.trigger(action.SET_CURRENT_QUESTION, conversation);
+        
+        self.showAnswer           = false;
+        self.showUnhappyContainer = true;
+        self.update();
+    });
+    
+    Dispatcher.on(routingAction.SHOW_HOME_PAGE_BROADCAST, function() {
+        self.showAnswer           = true;
+        self.showUnhappyContainer = false;
+        self.root.classList.add("initialViewing");
+        self.update();
+    });
+    
     // When we've received negative feedback
     Dispatcher.on(action.NEGATIVE_FEEDBACK_RECEIVED_BROADCAST, function() {
+        Dispatcher.trigger(routingAction.REFINEMENT_REQUESTED);
+        
         self.showAnswer           = false;
         self.showUnhappyContainer = true;
         self.update();
@@ -34,11 +53,9 @@
         
         self.showAnswer           = true;
         self.showUnhappyContainer = false;
-        self.showHappyContainer   = false;
         self.root.classList.remove("blurred");
         self.root.classList.remove("initialViewing");
         self.opts.hideindicator();
-        
         self.update();
     });
     

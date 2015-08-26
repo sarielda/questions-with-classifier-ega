@@ -6,12 +6,20 @@
     <question-unanswerable if={this.showQuestionUnanswerable} lowConfidence=true></question-unanswerable>
     
     <script>
-        var self   = this,
-            action = require("./action.js");
+        var self          = this,
+            action        = require("./action.js"),
+            routingAction = require("./routingAction.js");
         
         this.on("mount", function() {
             self.showAnswer = false;
             self.showQuestionUnanswerable = false;
+        });
+        
+        Dispatcher.on(routingAction.SHOW_HOME_PAGE_BROADCAST, function() {
+            self.showAnswer = false;
+            self.showQuestionUnanswerable = false;
+            self.root.classList.add("noAnswer");
+            self.update();
         });
         
         // Determine what to show when an answer has been received.
@@ -34,13 +42,6 @@
         // When we've received feedback, hide the answer
         Dispatcher.on(action.NEGATIVE_FEEDBACK_RECEIVED_BROADCAST, function() {
             self.showAnswer = false; 
-        });
-        
-        // The user has selected "None of the above" for a low confidence answer
-        Dispatcher.on(action.NONE_OF_THE_ABOVE_CLICKED_BROADCAST, function() {
-        	self.showAnswer = false;
-        	self.showQuestionUnanswerable = true;
-        	self.update();
         });
         
     </script>

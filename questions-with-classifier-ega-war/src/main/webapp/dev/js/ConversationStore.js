@@ -1,8 +1,9 @@
 /* Copyright IBM Corp. 2015 Licensed under the Apache License, Version 2.0 */
 
-var riot      = require("riot"),
-    action    = require("./action.js"),
-    constants = require("./constants.js");
+var riot          = require("riot"),
+    action        = require("./action.js"),
+    routingAction = require("./routingAction.js"),
+    constants     = require("./constants.js");
 
 // ConversationStore definition.
 // Flux stores house application logic and state that relate to a specific domain.
@@ -13,13 +14,18 @@ function ConversationStore() {
     var self = this;
 
     self.conversation = {
-        conversationId : "",
-        message        : "",
-        messageId      : "",
-        responses      : [],
-        topQuestions   : []
+        conversationId  : "",
+        message         : "",
+        messageId       : "",
+        responses       : [],
+        topQuestions    : []
     };
-
+    
+    // Question history is kept in chronological order, oldest at index 0.
+    // Question cache format: messageId : {message: "", responses: []}
+    self.questionHistory = [];
+    self.questionCache   = {};
+    
     /**
      * Takes a response and processes its body for a JSON response
      * @param {Object} Server response with a body in JSON format
@@ -66,7 +72,7 @@ function ConversationStore() {
             self.conversation.conversationId = data.conversationId;
             self.conversation.topQuestions   = data.topQuestions;
             
-            self.trigger(action.CONVERSATION_STARTED_BROADCAST, self.conversation); 
+            self.trigger(action.CONVERSATION_STARTED_BROADCAST, self.conversation);
             self.trigger(action.TOP_QUESTIONS_BROADCAST, self.conversation.topQuestions);
         })
         .catch(function(error) {
@@ -76,44 +82,69 @@ function ConversationStore() {
     
 	/**
 	 * Asks a question to the server, updates the local store, triggers a response event
+     * @param {String} Question is the question text
 	 */
     self.on(action.ASK_QUESTION, function(question) {
         
         self.trigger(action.ASKING_QUESTION_BROADCAST);
         
-        var requestBody = {};
+        var messageId     = question.messageId,
+            cachedMessage = self.questionCache[messageId];
         
-        if (question.message) {
-            requestBody.message = question.message;
-        }
+        if (messageId && cachedMessage) {
+        // recall from cache
+            self.conversation.responses       = cachedMessage.responses;
+            self.conversation.messageId       = messageId;
+            self.conversation.message         = cachedMessage.message;
 
-        if (question.referrer) {
-            requestBody.referrer        = {};
-            requestBody.referrer.source = question.referrer;
-            if (question.referrer === constants.refinementQueryType) {
-                requestBody.referrer.messageId = self.conversation.messageId;
-            }
-        }
-        
-        fetch(constants.conversationUrl + self.conversation.conversationId, {
-            method: "post",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(requestBody)
-        })
-        .then(_analyzeStatus)
-        .then(_parseJson)
-        .then(function(data) {
-            
-            self.conversation.responses = data.responses;
-            self.conversation.messageId = data.messageId;
-            self.conversation.message   = data.message;
-
-            self.trigger(action.ANSWER_RECEIVED_BROADCAST, self.conversation);
+            self.trigger(action.ANSWER_RECEIVED_BROADCAST,      self.conversation);
             self.trigger(action.ALTERNATIVE_QUESTION_BROADCAST, self.conversation);
-        })
-        .catch(function(error) {
-            self.trigger(action.SERVER_ERROR_BROADCAST, error);
-        });
+        }
+        else {
+        // just kidding, not in our cache
+            var requestBody = {};
+        
+            if (question.message) {
+                requestBody.message = question.message;
+            }
+
+            if (question.referrer) {
+                requestBody.referrer        = {};
+                requestBody.referrer.source = question.referrer;
+                if (question.referrer === constants.refinementQueryType) {
+                    requestBody.referrer.messageId = self.conversation.messageId;
+                }
+            }
+        
+            fetch(constants.conversationUrl + self.conversation.conversationId, {
+                method: "post",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(requestBody)
+            })
+            .then(_analyzeStatus)
+            .then(_parseJson)
+            .then(function(data) {
+            
+                // Update the cache
+                var oldMessageId = data.messageId;
+        
+                self.questionHistory.push(oldMessageId);
+                self.questionCache[oldMessageId] = { 
+                    "message"   : data.message, 
+                    "responses" : data.responses
+                };
+                
+                self.conversation.responses       = data.responses;
+                self.conversation.messageId       = data.messageId;
+                self.conversation.message         = data.message;
+
+                self.trigger(action.ANSWER_RECEIVED_BROADCAST,      self.conversation);
+                self.trigger(action.ALTERNATIVE_QUESTION_BROADCAST, self.conversation);
+            })
+            .catch(function(error) {
+                self.trigger(action.SERVER_ERROR_BROADCAST, error);
+            });
+        }
     });
     
 	/**
@@ -203,10 +234,14 @@ function ConversationStore() {
     /**
      * The user clicked on something to open up the forum in a new tab
      */
-    self.on(action.FORUM_BUTTON_PRESSED, function() {
+    self.on(action.FORUM_BUTTON_PRESSED, function(messageId) {
+        
+        // if we're given a messageId, it means the user is responding to a cached answer.
+        var postMessageId = messageId ? messageId : self.conversation.messageId;
+        
         var postData = {
                 "conversationId": self.conversation.conversationId,
-                "messageId": self.conversation.messageId,
+                "messageId": postMessageId,
                 "action": "FORUM_REDIRECT" 
         };
         
@@ -224,6 +259,43 @@ function ConversationStore() {
             self.trigger(action.SERVER_ERROR_BROADCAST, error);
         });
     });
+    
+    /**
+     * Set the current question to the one provided
+     */
+    self.on(action.SET_CURRENT_QUESTION, function(question) {
+        
+        var messageId     = question.messageId,
+            cachedMessage = self.questionCache[messageId];
+    
+        if (messageId && cachedMessage) {
+        // recall from cache
+            self.conversation.responses       = cachedMessage.responses;
+            self.conversation.messageId       = messageId;
+            self.conversation.message         = cachedMessage.message;
+        }
+    });
+    
+    /**
+     * Gets the conversation for the given questionId from cache
+     * @param {Object} {question: (required)questionId}
+     */
+    self.on(action.UPDATE_REFINEMENT_QUESTIONS, function(question) {
+        
+        var conversation  = null,
+            messageId     = question.messageId,
+            cachedMessage = self.questionCache[messageId];
+    
+        if (messageId && cachedMessage) {
+        // recall from cache
+            conversation           = {};
+            conversation.responses = cachedMessage.responses;
+            conversation.messageId = messageId;
+            conversation.message   = cachedMessage.message;
+
+            self.trigger(action.UPDATE_REFINEMENT_QUESTIONS_BROADCAST, conversation);
+        }
+    });
 
 	/**
 	 * Checks the local cache for a current list of alternative questions, and triggers a broadcast
@@ -231,7 +303,6 @@ function ConversationStore() {
 	 */
     self.on(action.GET_ALTERNATIVE_QUESTIONS, function() {
         
-        //TODO continue
         self.trigger(action.ALTERNATIVE_QUESTION_BROADCAST, self.conversation);
     });
     

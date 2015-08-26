@@ -30,8 +30,9 @@
     
     <script>
     
-    var self   = this,
-        action = require("./action.js");
+    var self          = this,
+        action        = require("./action.js"),
+        routingAction = require("./routingAction.js");
         
 	self.initialviewing              = opts.initialviewing;
 	self.questionPlaceHolderText     = polyglot.t("typicalQuestionText");
@@ -53,6 +54,13 @@
         return inputString === "true" ? true : false;
     }
     
+    Dispatcher.on(routingAction.SHOW_HOME_PAGE_BROADCAST, function() {
+        self.initialviewing = "true";
+        self.root.classList.add("noAnswer");
+        self.root.classList.add("initialViewing");
+        self.update();
+    });
+    
     Dispatcher.on(action.ANSWER_RECEIVED_BROADCAST, function(conversation) {
         self.root.classList.remove("active");
 
@@ -66,10 +74,10 @@
         self.update();
     });
     
-    Dispatcher.on(action.CONVERSATION_STARTED_BROADCAST, function() {
+    Dispatcher.on(action.CONVERSATION_STARTED_BROADCAST, function(conversation) {
         self.askButton.disabled          = false;
         self.questionInputField.disabled = false; 
-    })
+    });
     
     validateQuestion(question) {
         // Basic input validation
@@ -117,7 +125,7 @@
         // Perform validation and fire off our event if this text is valid
         if (questionText && self.validateQuestion(questionText)) {
             self.questionValidationError.classList.remove("active");
-            Dispatcher.trigger(action.ASK_QUESTION, {"message" : questionText});
+            Dispatcher.trigger(action.ASK_QUESTION, { message : questionText });
         }
     }
 

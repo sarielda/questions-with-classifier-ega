@@ -5,12 +5,20 @@
     <powered-by class="poweredBy-home"></powered-by>
     
     <script>
-    var action = require("./action.js"),
-        self   = this;
+    
+    var action        = require("./action.js"),
+        routingAction = require("./routingAction.js"),
+        self          = this;
 
     // When a question has been asked
-    Dispatcher.on(action.ASK_QUESTION, function(question) {
+    Dispatcher.on(action.ASKING_QUESTION_BROADCAST, function(question) {
         self.root.classList.add("blurred");
+    });
+    
+    // Show home page
+    Dispatcher.on(routingAction.SHOW_HOME_PAGE_BROADCAST, function() {
+        self.root.classList.remove("questionHasBeenAsked");
+        self.root.classList.remove("blurred");
     });
     
     Dispatcher.on(action.ANSWER_RECEIVED_BROADCAST, function(conversation) {
@@ -23,5 +31,6 @@
         self.root.classList.remove("questionHasBeenAsked");
         self.root.classList.remove("blurred");
     });
+    
     </script>
 </home-tab-container>
