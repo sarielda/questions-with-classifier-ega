@@ -19,8 +19,10 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
+import com.ibm.watson.app.qaclassifier.SampleQuestions;
 import com.ibm.watson.app.qaclassifier.selenium.drivers.Multiplatform;
 import com.ibm.watson.app.qaclassifier.selenium.drivers.Multiplatform.InjectDriver;
 
@@ -30,7 +32,18 @@ public class HistoryIT {
     public WebDriver driver;
     
     @Test
-    public void pageLoadsSuccessfully() {
-        assertTrue(true);
+    public void homeToQuestionToHome() {
+        CommonFunctions.askQuestionViaTextInput(driver, SampleQuestions.HIGH_CONFIDENCE);
+        driver.navigate().back();
+        
+        if (CommonFunctions.isMobileUI(driver) || CommonFunctions.isTabletUI(driver)) {
+            assertTrue("Loading the home page, asking a question, and pressing back returns back to home page",
+            		driver.findElement(By.className("getting-started-mobile")).isDisplayed());
+        }
+        else {
+            assertTrue("Loading the home page, asking a question, and pressing back returns back to home page",
+            		driver.findElement(By.className("getting-started-desktop")).isDisplayed());
+        }
+
     }
 }
