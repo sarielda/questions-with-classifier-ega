@@ -15,6 +15,8 @@
 
 package com.ibm.watson.app.qaclassifier.selenium;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -44,6 +46,41 @@ public class HistoryIT {
             assertTrue("Loading the home page, asking a question, and pressing back returns back to home page",
             		driver.findElement(By.className("getting-started-desktop")).isDisplayed());
         }
+    }
+    
+    @Test
+    public void homeToLowQuestionToHighQuestionThenBack() {
+        CommonFunctions.askQuestionViaTextInput(driver, SampleQuestions.HIGH_CONFIDENCE);
+        CommonFunctions.askQuestionViaTextInput(driver, SampleQuestions.LOW_CONFIDENCE);
 
+        driver.navigate().back();
+
+        assertThat("After asking two questions, pressing back shows the proper text for the first question",
+                CommonFunctions.getDisplayedQuestionText(driver), containsString(SampleQuestions.HIGH_CONFIDENCE));
+        
+        assertTrue("After asking two questions, pressing back shows an answer",
+        		CommonFunctions.getDisplayedAnswerText(driver).length() > 0);
+    }
+    
+    @Test
+    public void homeToLowQuestionToHighQuestionThenBackThenForward() {
+        CommonFunctions.askQuestionViaTextInput(driver, SampleQuestions.HIGH_CONFIDENCE);
+        CommonFunctions.askQuestionViaTextInput(driver, SampleQuestions.LOW_CONFIDENCE);
+
+        driver.navigate().back();
+
+        assertThat("After asking two questions, pressing back shows the proper text for the first question",
+                CommonFunctions.getDisplayedQuestionText(driver), containsString(SampleQuestions.HIGH_CONFIDENCE));
+        
+        assertTrue("After asking two questions, pressing back shows an answer",
+        		CommonFunctions.getDisplayedAnswerText(driver).length() > 0);
+        
+        driver.navigate().forward();
+        
+        assertThat("After pressing back, pressing forward shows the proper text for the second question",
+                CommonFunctions.getDisplayedQuestionText(driver), containsString(SampleQuestions.LOW_CONFIDENCE));
+        
+        assertTrue("After pressing back, pressing forward shows the 'none of the above' option",
+        		CommonFunctions.findNoneOfTheAboveButton(driver).isDisplayed());
     }
 }

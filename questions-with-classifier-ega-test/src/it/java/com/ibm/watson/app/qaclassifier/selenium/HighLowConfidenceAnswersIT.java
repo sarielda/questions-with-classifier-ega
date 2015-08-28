@@ -15,7 +15,6 @@
 
 package com.ibm.watson.app.qaclassifier.selenium;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -39,11 +38,8 @@ public class HighLowConfidenceAnswersIT {
         String questionText = SampleQuestions.HIGH_CONFIDENCE;
         CommonFunctions.askQuestionViaTextInput(driver, questionText);
 
-        assertThat("After asking question via text input, found expected question text on answer page",
-                getDisplayedQuestionText(), containsString(questionText));
-
         assertTrue("After asking question via text input, found answer text on answer page",
-                getDisplayedAnswerText().length() > 0);
+        		CommonFunctions.getDisplayedAnswerText(driver).length() > 0);
         
         assertTrue("After a high confidence answer has been received, the positive feedback button is shown",
         		driver.findElement(By.id("positiveFeedbackInput")).isDisplayed());
@@ -56,43 +52,20 @@ public class HighLowConfidenceAnswersIT {
     public void askLowConfidenceQuestionViaTextInput() {
         CommonFunctions.askQuestionViaTextInput(driver, SampleQuestions.LOW_CONFIDENCE);
 
-        assertThat("After asking question via text input, find expected question text on answer page",
-                getDisplayedQuestionText(), containsString(SampleQuestions.LOW_CONFIDENCE));
-
         assertTrue("After asking question via text input, find low confidence prompt on page",
-        		findNoneOfTheAboveButton());
+        		CommonFunctions.findNoneOfTheAboveButton(driver).isDisplayed());
     }
     
     @Test
     public void askNoAnswerQuestion() {
         CommonFunctions.askQuestionViaTextInput(driver, SampleQuestions.NO_ANSWERS);
 
-        assertThat("After asking question via text input, find expected question text on answer page",
-        		driver.findElement(By.id("questionTitle")).getText(), containsString(SampleQuestions.NO_ANSWERS));
-
         assertTrue("After asking question via text input, find the forum button in Still Need Help section",
-                visitForumButtonFound());
+                CommonFunctions.findVisitTheForumButton(driver).isDisplayed());
         
         CommonFunctions.findVisitTheForumButton(driver).click();
         CommonFunctions.switchTabs(driver);
         assertThat("After clicking on the forum button, page is redirected",
         		driver.getTitle(), is("natural-language-classifier - dWAnswers"));
-        driver.close();
-    }
-
-    private String getDisplayedQuestionText() {
-        return driver.findElement(By.className("question-text")).getText();
-    }
-
-    private String getDisplayedAnswerText() {
-        return driver.findElement(By.className("answer-quote")).getText();
-    }
-    
-    private Boolean findNoneOfTheAboveButton() {
-    	return CommonFunctions.findNoneOfTheAboveButton(driver).isDisplayed();
-    }
-    
-    private Boolean visitForumButtonFound() {
-    	return CommonFunctions.findVisitTheForumButton(driver).isDisplayed();
     }
 }

@@ -15,7 +15,6 @@
 
 package com.ibm.watson.app.qaclassifier.selenium;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -40,11 +39,8 @@ public class FeedbackScreensIT {
     public void thisWasHelpfulAllowsNewInput() {
         CommonFunctions.askQuestionViaTextInput(driver, SampleQuestions.HIGH_CONFIDENCE);
 
-        assertThat("After asking question via text input, didn't find expected question text on answer page",
-                getDisplayedQuestionText(), containsString(SampleQuestions.HIGH_CONFIDENCE));
-
-        assertTrue("After asking question via text input, didn't find any answer text on answer page",
-                getDisplayedAnswerText().length() > 0);
+        assertTrue("After asking question via text input, find answer text on answer page",
+                CommonFunctions.getDisplayedAnswerText(driver).length() > 0);
         
         WebElement positiveFeedbackButton = driver.findElement(By.id("positiveFeedbackInput"));
        
@@ -55,7 +51,7 @@ public class FeedbackScreensIT {
         assertThat("After 'This was Helpful' button was pressed, thanks message is displayed",
                 driver.findElements(By.className("thanksImage")), hasSize(1));
         
-        if (! CommonFunctions.isMobileUI(driver) && ! CommonFunctions.isTabletUI(driver)) {
+        if (!CommonFunctions.isMobileUI(driver) && !CommonFunctions.isTabletUI(driver)) {
             assertThat("After 'This was Helpful' button was pressed, text input could not be made for another question",
                     driver.findElements(By.id("questionInputField")), hasSize(1));
             
@@ -68,11 +64,8 @@ public class FeedbackScreensIT {
     public void iStillNeedHelpShowsProperly() {
         CommonFunctions.askQuestionViaTextInput(driver, SampleQuestions.HIGH_CONFIDENCE);
 
-        assertThat("After asking question via text input, didn't find expected question text on answer page",
-                getDisplayedQuestionText(), containsString(SampleQuestions.HIGH_CONFIDENCE));
-
-        assertTrue("After asking question via text input, didn't find any answer text on answer page",
-                getDisplayedAnswerText().length() > 0);
+        assertTrue("After asking question via text input, find answer text on answer page",
+                CommonFunctions.getDisplayedAnswerText(driver).length() > 0);
         
         WebElement negativeFeedbackButton = driver.findElement(By.id("negativeFeedbackInput"));
        
@@ -112,18 +105,7 @@ public class FeedbackScreensIT {
     	CommonFunctions.switchTabs(driver);
         assertThat("After clicking on the forum button, page is redirected",
         		driver.getTitle(), is("natural-language-classifier - dWAnswers"));
-        
-        driver.close();
 
         // Can't verify that the feedback was logged, but the log scans will catch any errors.
-    }
-
-
-    private String getDisplayedQuestionText() {
-        return driver.findElement(By.className("question-text")).getText();
-    }
-
-    private String getDisplayedAnswerText() {
-        return driver.findElement(By.className("answer-quote")).getText();
     }
 }
