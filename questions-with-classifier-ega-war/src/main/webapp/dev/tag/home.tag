@@ -22,14 +22,13 @@
         self.update();
     });
     
-    self.on("update", function() {
-        if (self.askQuestionTag && !self.askQuestionTag.classList.contains("initialViewing")) {
-            self.initialViewing = false;
-        }
-    });
-    
     Dispatcher.on(routingAction.SHOW_HOME_PAGE_BROADCAST, function() {
         self.initialViewing = true;
+        self.update();
+    });
+    
+    Dispatcher.on(action.ANSWER_RECEIVED_BROADCAST, function(conversation) {
+        self.initialViewing = false;
         self.update();
     });
 

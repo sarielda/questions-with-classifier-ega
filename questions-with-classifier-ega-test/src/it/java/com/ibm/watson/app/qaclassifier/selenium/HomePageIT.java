@@ -52,13 +52,10 @@ public class HomePageIT {
 
     @Test
     public void askQuestionViaTopQuestions() {
-        String questionText = CommonFunctions.askQuestionViaTopQuestions(driver);
+        CommonFunctions.askQuestionViaTopQuestions(driver);
 
-        assertThat("After asking first top question, didn't find expected top question text on answer page",
-                getDisplayedQuestionText(), containsString(questionText));
-
-        assertTrue("After asking first top question, didn't find any answer text on answer page",
-                getDisplayedAnswerText().length() > 0);
+        assertTrue("After asking first top question, find answer text on answer page",
+                CommonFunctions.getDisplayedAnswerText(driver).length() > 0);
     }
 
     @Test
@@ -69,13 +66,5 @@ public class HomePageIT {
         WebElement errorText = driver.findElement(By.id("questionValidationError"));
         assertTrue("Error message was not displayed after asking an invalid question", errorText.isDisplayed());
         assertThat("Incorrect error message", errorText.getText(), containsString("A question must contain at least one word"));
-    }
-
-    private String getDisplayedQuestionText() {
-        return driver.findElement(By.className("question-text")).getText();
-    }
-
-    private String getDisplayedAnswerText() {
-        return driver.findElement(By.className("answer-quote")).getText();
     }
 }

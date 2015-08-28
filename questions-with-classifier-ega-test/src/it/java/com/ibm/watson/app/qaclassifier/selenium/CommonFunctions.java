@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThat;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.HasCapabilities;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
@@ -38,7 +39,7 @@ public class CommonFunctions {
      */
     public static void askQuestionViaTextInput(WebDriver driver, String questionText) {
         driver.findElement(By.id("questionInputField")).sendKeys(questionText + "\n");
-        waitForAnswer(driver);
+        waitForAnswer(driver, questionText);
     }
 
     /**
@@ -62,7 +63,7 @@ public class CommonFunctions {
         String questionText = topQuestion.getText();
         topQuestion.click();
 
-        waitForAnswer(driver);
+        waitForAnswer(driver, questionText);
 
         return questionText;
     }
@@ -108,6 +109,14 @@ public class CommonFunctions {
         return ((HasCapabilities) driver).getCapabilities().getBrowserName();
     }
     
+    public static String getDisplayedQuestionText(WebDriver driver) {
+        return driver.findElement(By.className("question-text")).getText();
+    }
+
+    public static String getDisplayedAnswerText(WebDriver driver) {
+        return driver.findElement(By.className("answer-quote")).getText();
+    }
+    
     public static WebElement findNoneOfTheAboveButton(WebDriver driver) {
     	return driver.findElement(By.className("none"));
     }
@@ -140,12 +149,23 @@ public class CommonFunctions {
         }
     }
 
-    private static void waitForAnswer(WebDriver driver) {
+    private static void waitForAnswer(WebDriver driver, final String questionText) {
         // We know that an answer has been returned when the answer tag has a child element.
         new WebDriverWait(driver, 10).until(new Predicate<WebDriver>() {
             @Override
             public boolean apply(WebDriver input) {
-                return input.findElements(By.xpath("//answer/*")).size() > 0;
+            	// If we're given a stale element exception, just return false and let it grab the correct
+            	// text during the next polling interval
+            	try {
+	                boolean answerFound       = input.findElements(By.xpath("//answer/*")).size() > 0;
+	                String foundText          = input.findElement(By.id("questionText")).getText();
+	                boolean questionTextFound = foundText.contains(questionText);
+	                
+	                return answerFound && questionTextFound;
+            	}
+            	catch (StaleElementReferenceException e) {
+            		return false;
+            	}
             }
         });
     }

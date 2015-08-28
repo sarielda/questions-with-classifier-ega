@@ -28,7 +28,6 @@ import net.jcip.annotations.NotThreadSafe;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
 import com.google.gson.Gson;
@@ -60,10 +59,6 @@ public class askQuestionUTF8IT {
 		String questionText = "Что такое NL Classifier 我叫王睿健?";
 
 		CommonFunctions.askQuestionViaTextInput(driver, questionText);
-
-		assertThat(
-				"After asking question via text input using UTF-8 chars, didn't find same question text on answer page",
-				getDisplayedQuestionText(), containsString(questionText));
 	}
 
 	@Test
@@ -78,7 +73,7 @@ public class askQuestionUTF8IT {
 			generateAnswerJsonAndPut(oldAnswer[0], TypeEnum.TEXT, newAnswerText, SampleQuestions.HIGH_CONFIDENCE);
 
 			CommonFunctions.askQuestionViaTextInput(driver, SampleQuestions.HIGH_CONFIDENCE);
-			answerText = getDisplayedAnswerText();
+			answerText = CommonFunctions.getDisplayedAnswerText(driver);
 		} 
 		finally {
 			// Restore our local db
@@ -129,13 +124,5 @@ public class askQuestionUTF8IT {
 
 	private String getAConversationId() {
 		return post(api_conversation).then().extract().path("conversationId");
-	}
-
-	private String getDisplayedQuestionText() {
-		return driver.findElement(By.className("question-text")).getText();
-	}
-
-	private String getDisplayedAnswerText() {
-		return driver.findElement(By.className("answer-quote")).getText();
 	}
 }

@@ -1,7 +1,7 @@
 /* Copyright IBM Corp. 2015 Licensed under the Apache License, Version 2.0 */
 
 <question-unanswerable>
-    <h3 if={lowConfidence} id="questionTitle" class="blueTitle"></h3>
+    <h3 if={lowConfidence} id="questionText" class="blueTitle"></h3>
     <div if={lowConfidence} class="refinement-title">{sorryTitle}</div>
 	<still-need-help class="stillNeedHelp"></still-need-help>	
 	<top-questions-tab if={ this.showTopQuestions }></top-questions-tab>
@@ -18,7 +18,7 @@
     });
 
     Dispatcher.on(action.ANSWER_RECEIVED_BROADCAST, function(conversation) {
-       self.questionTitle.innerHTML = "\"<strong>" + conversation.message + "</strong>\"";
+       self.questionText.innerHTML = "\"<strong>" + conversation.message + "</strong>\"";
     });
     
 	</script>
