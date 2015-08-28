@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThat;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.HasCapabilities;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
@@ -153,11 +154,18 @@ public class CommonFunctions {
         new WebDriverWait(driver, 10).until(new Predicate<WebDriver>() {
             @Override
             public boolean apply(WebDriver input) {
-                boolean answerFound       = input.findElements(By.xpath("//answer/*")).size() > 0;
-                String foundText = input.findElement(By.id("questionText")).getText();
-                boolean questionTextFound = foundText.contains(questionText);
-                
-                return answerFound && questionTextFound;
+            	// If we're given a stale element exception, just return false and let it grab the correct
+            	// text during the next polling interval
+            	try {
+	                boolean answerFound       = input.findElements(By.xpath("//answer/*")).size() > 0;
+	                String foundText          = input.findElement(By.id("questionText")).getText();
+	                boolean questionTextFound = foundText.contains(questionText);
+	                
+	                return answerFound && questionTextFound;
+            	}
+            	catch (StaleElementReferenceException e) {
+            		return false;
+            	}
             }
         });
     }
