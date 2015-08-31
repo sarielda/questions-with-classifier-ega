@@ -309,11 +309,13 @@ welcome, service-unavailable {
                 #screenText {
                     color: $body-color;
                     padding-top: 1em;
+                    margin-left: 1em;
                 }
             
                 #trainMeText {
                     color: $welcome-dark-text;
                     padding-top: 1em;
+                    margin-left: 1em;
                 }
             }
             
