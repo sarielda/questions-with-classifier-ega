@@ -2,11 +2,11 @@
 
 <still-need-help>
     <div class="horizontal-line">.</div>
-	<h2 class="still-need-help-title">{stillNeedHelpTitle}</h2>
+	<h2>{stillNeedHelpTitle}</h2>
 	
-	<div class="still-need-help-content" id="explanation"></div>
+	<div id="explanation"></div>
 	
-	<div class="still-need-help-content" id="tips-container">
+	<div id="tips-container">
 		<div>{tipsTitle}</div>
 		<ul class="tips">
 			<li each={ tip, i in tips } class="tip-{i}">{tip}</li>
