@@ -442,10 +442,10 @@ menu-overlay {
     }
     #menu {
         position: absolute;
-        height: 66%;
-        width: 66%;
-        top: 17%; // Half of the remaining 34% of space to center it
-        left: 17%;
+        top: 3em;
+        bottom: 3em;
+        left: 5em;
+        right: 5em;
         margin: 0 auto;
         background-color: #FFFFFF;
         padding: 3em;        
@@ -459,6 +459,11 @@ menu-overlay {
                 float: left;
                 margin: 0px;
             }
+        }
+        span.close {
+            cursor: pointer;
+            font-size: 1.2em;
+            float: right;
         }
         span.close:after {
             content:"X";
@@ -504,9 +509,8 @@ menu-list {
         margin: .5em 0 0 0;
         list-style-type: none;
         li {
-        	height: 64px;
-            padding-top: 1.5em;
-            padding-bottom: 1.5em;
+        	height: 50px;
+            padding-top: 1em;
             padding-left: 2em;
             list-style-type: none;
             border-bottom: 1px solid $border-color-menu;
@@ -522,7 +526,8 @@ menu-list {
         li h3 {
         	float: left;
             margin: 0px;
-            font-size: 133%;
+            font-size: 1.25em;
+            font-weight: normal;
         }
         .menu-option-home {
             display: block;
@@ -579,9 +584,7 @@ menu-list {
     width: 100%;
     border: none;
     background-color: $body-color;
-    padding-left: 1em;
     padding-right: 0px;
-    overflow-y: auto;
     height: -moz-calc(100% - 80px); /* Firefox */
     height: -webkit-calc(100% - 80px); /* Safari */
     height: calc(100% - 80px); /* IE9+, Chrome, and future browsers */
@@ -672,12 +675,16 @@ menu-list {
 
 .top-questions-tab {
     display: block;
+    padding-left: 1em;
     background-color: $body-color;
 }
 
 .top-questions-title {
     color: $blue-text-color;
     padding: .5em;
+    margin: .5em 0;
+    font-size: 1.25em;
+    font-weight: normal;
 }
 
 .refinement-title {
@@ -699,10 +706,10 @@ menu-list {
     display: table;
     height: 50px;
     margin-bottom: .5em;
+    padding-right: .5em;
     border-style: solid;
     border-width: 1px;
     border-color: $grey-border-color transparent transparent;
-    width: 100%;
 }
 
 .refinement-white {
@@ -740,6 +747,7 @@ menu-list {
     padding-bottom: .5em;
     line-height: normal;
     font-size: 1em;
+    font-weight: normal;
 }
 
 .top-question-text:hover {
@@ -824,18 +832,14 @@ question-unanswerable {
 
 .circle {
     background-color: $circle-color;
-}
-
-span.helper {
-    display: table-cell;
     width: 32px;
     height: 32px;
-    text-align: center;
-    border-radius: 25px;
-    padding: .5em 0 0 0;
+    border-radius: 50%;
+    margin: 1em 1em 1em 0;
     color: $blue-text-color;
-    margin: 1em 0 0.7em 0.3em;
     font-size: 1em;
+    line-height: 32px;
+    text-align: center;
 }
 
 .questionContainer {
@@ -948,11 +952,12 @@ span.helper {
 
 .question-input-box { 
     @extend .square;
-    width: 100% !important;
-    margin-left: 0;
-    margin-right: 0;
+    width: 97%;
+    height: 3em;
+    line-height: 2em;
+    font-size: 1em;
+    padding: 0 0 0 3%;
     border: 0;
-
     // Remove the drop shadow, so we have a nicer flatter look
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
@@ -963,25 +968,21 @@ span.helper {
 .form-control::-webkit-input-placeholder { 
     font-style: italic;
     color: $placeholder-font-color; 
-    font-size: .85em;
     text-overflow: ellipsis;
 }
 .form-control:-moz-placeholder { 
     font-style: italic;
     color: $placeholder-font-color; 
-    font-size: .85em;
     text-overflow: ellipsis;
 }
 .form-control::-moz-placeholder {
     font-style: italic;
     color: $placeholder-font-color; 
-    font-size: .85em;
     text-overflow: ellipsis;
 }
 .form-control:-ms-input-placeholder {
     font-style: italic;
     color: $placeholder-font-color; 
-    font-size: .85em;
     text-overflow: ellipsis;
 }
 
@@ -1111,7 +1112,11 @@ span.helper {
 .btn-primary {
     background-color: $ask-button-indigo;
     width: 18%;
+    height: 3em;
+    border: none;
     float: right;
+    color: $body-color;
+    font-size: 1em;
 }
 
 // Remove user-accessibility button glow added by Bootstrap
@@ -1178,7 +1183,6 @@ span.helper {
         @include align-items(center);
         @include flex-direction(row-reverse);
         margin: 0;
-        padding-left: 1em;
         width: 25%;
         height: 100%;
     }
@@ -1202,6 +1206,7 @@ span.helper {
         display: block;
         color: $dark-grey-text;
         padding-left: 1em;
+        margin-left: 1em;
         margin-top: 2em;
         border-left: 4px;
         border-style: solid;
