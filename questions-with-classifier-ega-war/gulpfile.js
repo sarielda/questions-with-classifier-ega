@@ -21,7 +21,6 @@ var gulp        = require('gulp'),
          "riotSrc"    :              bowerDir  + "/riot",
          "fetchSrc"   :              bowerDir  + "/fetch",
          "promise"    :              bowerDir  + "/es6-promise",
-         "bootstrap"  :              bowerDir  + "/bootstrap-sass",
          "webdev"     : webdev     = workdir   + "/dev",
          "sass"       :              webdev    + "/sass",
          "tag"        :              webdev    + "/tag",
@@ -44,13 +43,8 @@ gulp.task("compile_sass", function() {
 });
 
 gulp.task("copy_sass_to_temp", function() {
-    var sassFiles = gulp.src(config.sass + "/*.scss")
+    return gulp.src(config.sass + "/*.scss")
         .pipe(gulp.dest(config.temp));
-    
-    var bootstrap = gulp.src(config.bootstrap + "/assets/stylesheets/**/*")
-        .pipe(gulp.dest(config.temp));
-    
-    return plugins.merge(sassFiles, bootstrap);
 });
 
 

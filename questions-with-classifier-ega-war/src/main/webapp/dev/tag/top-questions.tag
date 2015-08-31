@@ -2,8 +2,8 @@
 
 <top-questions>
     <div each={ question, i in questions } class="question">
-        <span class="helper col-xs-2 circle"> {i + 1} </span>
-        <h4 class="top-question-text col-xs-10" onclick={ parent.askTopQuestion } id="top-question-{ i }">{ question.questionText }</h4>
+        <div class="circle"> {i + 1} </div>
+        <h4 class="top-question-text" onclick={ parent.askTopQuestion } id="top-question-{ i }">{ question.questionText }</h4>
     </div>
 
     <script>
