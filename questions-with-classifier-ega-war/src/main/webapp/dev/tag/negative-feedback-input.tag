@@ -5,8 +5,9 @@
         id="askButton" 
         type="submit" 
         class="btn-feedback">
-            <img src="images/Wrong_88.svg" class="feedback-img">
-            <p> {posFeedbackText} </p>
+        <div class="feedback-wrapper">
+            <img src="images/Wrong_88.svg"><p>{posFeedbackText}</p>
+        </div>
     </button>
 
     <script>

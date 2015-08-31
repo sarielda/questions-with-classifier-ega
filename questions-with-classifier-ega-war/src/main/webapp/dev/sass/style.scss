@@ -1110,10 +1110,7 @@ question-unanswerable {
     @extend .input-lg;
     @extend .square;
     
-    @include displayFlex;
-    @include align-items(center);
-    @include justify-content(center);
-    
+
     background-color: $body-color;
     color: $answer-text;
     width: 100%;
@@ -1122,17 +1119,22 @@ question-unanswerable {
     border: 0;
     white-space: normal;
     overflow: hidden;
-    img{
-        display: inline-block;
-        width: 34px; 
-        height: 100%;
-    }
-    p{
-        display: inline-block;
-        text-align: left;
-        font-size: 1.25em;
-        vertical-align: middle;
-        margin: 0px;
+    
+    .feedback-wrapper {
+        @include displayFlex;
+        @include align-items(center);
+        @include justify-content(center);
+        
+        img{
+            display: inline-block;
+            width: 34px; 
+        }
+        p{
+            display: inline-block;
+            text-align: left;
+            font-size: 1.25em;
+            vertical-align: middle;
+        }
     }
 }
 
@@ -1176,10 +1178,6 @@ question-unanswerable {
     border-style: solid;
     float: right;
     margin-right: .5em;
-}
-
-.feedback-img {
-    height: 100%;
 }
 
 /* Desktop */

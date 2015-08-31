@@ -4,7 +4,11 @@
     <button onclick={positiveFeedbackButtonPressed} 
         id="askButton" 
         type="submit" 
-        class="btn-feedback"><img src="images/Correct_88.svg" class="feedback-img"> <p> {posFeedbackText} </p> </button>
+        class="btn-feedback">
+        <div class="feedback-wrapper">
+            <img src="images/Correct_88.svg"><p>{posFeedbackText}</p>
+        </div>
+    </button>
 
     <script>
     var action = require("./action.js");
