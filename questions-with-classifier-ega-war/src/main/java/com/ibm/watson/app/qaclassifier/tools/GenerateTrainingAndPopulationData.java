@@ -359,13 +359,13 @@ public class GenerateTrainingAndPopulationData {
         
         // make sure we can create the question output file
         questionOutput = new File(questionOutputFile);
-        if( !questionOutput.getParentFile().exists() && !questionOutput.getParentFile().mkdirs() ) {
+        if( (null != questionOutput.getParentFile()) && !questionOutput.getParentFile().exists() && !questionOutput.getParentFile().mkdirs() ) {
             throw new IllegalArgumentException(MessageKey.AQWQAC14202E_unable_create_parent_dir_for_file_1.getMessage(questionOutput.getAbsolutePath()).getFormattedMessage());
         }       
 
         // make sure we can create the question output file
         answerOutput = new File(answerOutputFile);
-        if( !answerOutput.getParentFile().exists() && !answerOutput.getParentFile().mkdirs() ) {
+        if( (null != answerOutput.getParentFile()) && !answerOutput.getParentFile().exists() && !answerOutput.getParentFile().mkdirs() ) {
             throw new IllegalArgumentException(MessageKey.AQWQAC14202E_unable_create_parent_dir_for_file_1.getMessage(answerOutput.getAbsolutePath()).getFormattedMessage());
         }       
     }
