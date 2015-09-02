@@ -124,23 +124,28 @@ public class PopulateAnswerStore {
 	}
 	
 	private static boolean populate(AnswerStoreRestClient client, String file, String dir) throws IOException {
-		// loads the answers.json file which has class, text, type, canonicalQuestion
-	    List<ManagedAnswer> data = loadData(file);
-	    
-	    // we now load the text (which is the answer) from an html file
-	    for(ManagedAnswer a : data ) {
-	    	String htmlFile = dir + "/" + a.getClassName() + ".html";
-	    	System.out.println(MessageKey.AQWQAC20000I_reading_and_setting_formated_text_from_1.getMessage(htmlFile).getFormattedMessage());
-	    	String formattedText = FileUtils.loadFromFilesystemOrClasspath(htmlFile);
-	    	a.setText(formattedText);
-	    }
-
-	    // While we are at it, the mocked classifier service adds in "defaultClass", so lets set that too
-	    ManagedAnswer defaultAnswer = new ManagedAnswer("defaultClass", TypeEnum.TEXT, "This answer is resolved from the default class", "Sample canonical question");
-	    data.add(defaultAnswer);
-	    
+	    List<ManagedAnswer> data = loadAnswerStore(file, dir);
         ResponseHandler<Boolean> handler = new BooleanResponseHandler();    
 	    return client.post(DEFAULT_ENDPOINT, new JSONEntity(gson.toJson(data)), handler);
+	}
+	
+	public static List<ManagedAnswer> loadAnswerStore(String file, String dir) throws IOException {
+	    // loads the answers.json file which has class, text, type, canonicalQuestion
+        List<ManagedAnswer> data = loadData(file);
+        
+        // we now load the text (which is the answer) from an html file
+        for(ManagedAnswer a : data ) {
+            String htmlFile = dir + "/" + a.getClassName() + ".html";
+            System.out.println(MessageKey.AQWQAC20000I_reading_and_setting_formated_text_from_1.getMessage(htmlFile).getFormattedMessage());
+            String formattedText = FileUtils.loadFromFilesystemOrClasspath(htmlFile);
+            a.setText(formattedText);
+        }
+
+        // While we are at it, the mocked classifier service adds in "defaultClass", so lets set that too
+        ManagedAnswer defaultAnswer = new ManagedAnswer("defaultClass", TypeEnum.TEXT, "This answer is resolved from the default class", "Sample canonical question");
+        data.add(defaultAnswer);
+        
+        return data;
 	}
 	
 	private static List<ManagedAnswer> loadData(String path) throws IOException {

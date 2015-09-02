@@ -47,18 +47,18 @@ The entire process lasts a few minutes. Although the app is deployed when the pr
 ### Stage 2: Choose which data you want to use
 In this stage, understand the types of data that the app requires and choose whether you want to use sample data or your own data. 
 
-The app requires a trained classifier to work properly. To train the classifier, you need training data, which maps a question to a class. The question-to-class mapping must be in JSON format.
+The app requires a trained classifier to work properly. To train the classifier, you need training data, which maps a question to a class. The question-to-class mapping must be in CSV format.
     
     question --> class
 
-Additionally, the app requires a populated answer store. The answer store is populated by answers data, which maps the classes from the training data to answers. The class-to-answer mapping must be in JSON format.
+Additionally, the app requires a populated answer store. The answer store is populated by a file which maps from classes to canonical questions, and by a directory containing formatted HTML answers. The class-to-canonical-question mapping must be in CSV format.
     
-    class --> answer
+    class --> canonicalQuestion
 	
 Choose whether you want to use sample data or your own data.
 
 #### **Sample data**
-The sample data is in the `training.json` and `answers.json` files in the `questions-with-classifier-ega-war > src > main > resources` directory. To use the sample data, go to [Stage 3: Train the classifier](#stage-3-train-the-classifier). 
+The sample data is in the `questions.csv` and `answers.csv` files in the `questions-with-classifier-ega-war > src > main > resources` directory. To use the sample data, go to [Stage 3: Train the classifier](#stage-3-train-the-classifier). 
   
 #### **Your own data**
 To use your own data instead of the sample data, see [Prepare your own data for training the classifier and populating the answer store](#prepare-your-own-data-for-training-the-classifier-and-populating-the-answer-store).
@@ -66,7 +66,7 @@ To use your own data instead of the sample data, see [Prepare your own data for 
 ***
 
 ### Stage 3: Train the classifier
-In this stage, train the classifier by using curl. To train the classifier in Eclipse, see [Training the classifier in Eclipse](#training-the-classifier-in-eclipse).
+In this stage, train the classifier by using curl.
 
 For more information about training the classifier, see the [Classifier API](https://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/apis/#!/natural-language-classifier).
 
@@ -82,13 +82,12 @@ For more information about training the classifier, see the [Classifier API](htt
 ### Stage 4: Populate the answer store
 In this stage, populate the answer store by using curl. To populate the answer store in Eclipse, see [Populating the answer store in Eclipse](#populating-the-answer-store-in-eclipse)
 
-To see the API that populates the answer store, open https://yourAppName.mybluemix.net/api, and see **Manage**.
+To see the API that populates the answer store, open https://yourAppName.mybluemix.net/api/doc, and see **Manage**.
 
   1. Ensure that your app is running. If it's not running, open your app in Bluemix and click **START**.
-  2. Ensure that your `answers.json` file matches your `training.json` file.
-  3. From a command prompt, run the following curl command. The `answers.json` file is assumed to be in the directory from which you run the command. If necessary, change the path to the file.
+  2. From a command prompt, run the following curl command. This assumes the command is run from the questions-with-classifier-ega directory.  If necessary, change the path to the file.
 
-    `curl -X POST -H "Content-Type: application/json" -d @answers.json http://yourAppName.mybluemix.net/api/v1/manage/answer`
+    `curl -X POST -H "Content-Type: application/json" -d @questions-with-classifier-ega-war/target/classes/answers.json http://yourAppName.mybluemix.net/api/v1/manage/answer`
 
 ### What to do next
 
@@ -185,6 +184,9 @@ If you want to secure the answer store endpoints, see [Deploying with security](
 ***
 
 ### Training the classifier in Eclipse
+
+***The training tool has not been updated to use the latest Classifier API.  Use [the curl instructions](#stage-3-train-the-classifier).***
+
 If you have loaded the code into Eclipse, you can use an included main class to help with training the Classifier. The program makes REST API calls to the [Classifier API](https://watson.stage1.mybluemix.net/apis/#!/natural-language-classifier), which can be done through any REST client. Although you can train multiple classifier instances, the app does not provide a way to specify which instance to use. By design, the app asks for a list of instances and selects the the first instance in the list. To ensure that you are using the correct instance for your app, train and keep only one instance at a time.
 
   1. Locate the `training.json` file. You can use one of the following files:
@@ -208,16 +210,21 @@ If you have loaded the code into Eclipse, you can use an included main class to 
 
 ### Populating the answer store in Eclipse
 If you have loaded the code into Eclipse, you can use an included main class to help with populating the answer store. The program makes a REST call to the same /manage/answer API that the curl command uses.
-  1. Locate the `answers.json` file. You can use one of the following files:
+  1. Locate the `answers.csv` file. You can use one of the following files:
     * The file that you generated during the [Prepare your own data for training the classifier and populating the answer store](#prepare-your-own-data-for-training-the-classifier-and-populating-the-answer-store) process.
     * The sample file in the `questions-with-classifier-ega-war > src > main > resources` directory.
   2. Run the **PopulateAnswerStore.java** command-line program. Use the following parameters:
   
     ```
-       usage: java com.ibm.watson.app.qaclassifier.tools.PopulateAnswerStore
-         -l,--url <url>     The root URL of the application to connect to. If omitted, the default will be used
-                            (http://localhost:9080)
-         -p,--path <path>   The path to be used as training data, can point to the file system or the class path
+        usage: java com.ibm.watson.app.qaclassifier.tools.PopulateAnswerStore
+         -d,--directory <directory>   The directory containing the html answer files, can point to the file system or the class
+                                      path
+         -f,--file <file>             The file to be used to populate the answers, can point to the file system or the class
+                                      path
+         -l,--url <url>               The root URL of the application to connect to. If omitted, the default will be used
+                                      (http://localhost:9080)
+         -p,--password <password>     The password for the manage API
+         -u,--user <user>             The username for the manage API
     ```
 
 The program checks the answer store for existing entries before it adds new entries. If existing entries are found, the program stops.
@@ -228,8 +235,8 @@ The program checks the answer store for existing entries before it adds new entr
 Use the following information to train the classifier on your own data.
 
 A command-line program that trains a classifier in included in the app. It does the following tasks:
-  * Generates the `training.json` file for training the classifier.
-  * Generates the `answers.json` file for populating the answer store.  
+  * Generates the `training.json` file used by the application at runtime.
+  * Generates the `answers.json` file for populating the answer store via a curl command.
 
 After these files are generated, you replace the sample .json files with them.
 
@@ -244,35 +251,37 @@ The following information assumes that you have collected and curated ground tru
 
 The methodology for acquiring this data and ensuring that it meets the requirements is outside of the scope of these instructions.
 
-  1. Generate a CSV file for questions. The command-line program uses a .csv file as input to create the training JSON file to be uploaded to the classifier by using the REST API. Use the following format in the questions.csv: QuestionText, LabelId.
+  1. Generate a CSV file for questions. Use the following format in the questions.csv: QuestionText, LabelId.
 
     | Term  | Description |
     | ------------- | ------------- |
     | QuestionText  | The text of the question.  |
     | LabelId  | The unique id of the class that a question corresponds to. It matches the LabelId in the answers file.  |  
 
-  2. Generate a CSV file for answers. When you call the 'classify' REST API and pass a question or text string, the classifier responds with a list of classes that are best associated with that text string based on its training data and algorithms. If you want to show the user an answer for those classes, you must associate each class with some answer text. The command-line program uses a .csv file as input to create and populate an answer store. Use the following format in the answers.csv: LabelId, AnswerValue, CanonicalQuestion.
+  2. Generate a CSV file for answers.  The command-line program uses a .csv file as input to create and populate an answer store. Use the following format in the answers.csv: LabelId, CanonicalQuestion.
 
     | Term  | Description |
     | ------------- | ------------- |
     | LabelId  | The unique id of the label for an answer. It matches the LabelId in the questions file.  |
-    | AnswerValue  | The text of the answer.  |
     | CanonicalQuestion  | The canonical question that is associated with an answer.  |  
 
      Classes that have no answer value are excluded and are not added to the answer store.
+     
+  3. For each LabelId in your CSV files, create an HTML file containing formatted answer text in a directory.  (The example location is questions-with-classifier-ega-war/src/main/resources/answers.)  The file should be named ${LabelID}.html.  When you call the 'classify' REST API and pass a question or text string, the classifier responds with a list of classes that are best associated with that text string based on its training data and algorithms. If you want to show the user an answer for those classes, you must associate each class with some answer text.
 
-  3. Generate your own training and answers JSON files.
+  4. Generate your own training and answers JSON files.
 
      A command-line program creates a training JSON file and an answers JSON file that you can use in the previous stages for training the classifier and populating the answer store. In the `com.ibm.watson.app.qaclassifier.tools` package of the `questions-with-classifier-ega-war` project, a class PopulateAnswerStore.java can be run and supplied with the .csv input files.  Use the following command-line parameters for this program:
 	
 	```
-       usage: java com.ibm.watson.app.qaclassifier.tools.GenerateTrainingAndPopulationData
-        -ain,--answerInput <answerInput>          input csv file containing answers data
-        -aout,--answerOutput <answerOutput>       filename and location for the answer store population data
-        -qin,--questionInput <questionInput>      input csv file containing questions and labels
-        -qout,--questionOutput <questionOutput>   filename and location for the classifier training data
+        usage: java com.ibm.watson.app.qaclassifier.tools.GenerateTrainingAndPopulationData
+         -adir,--answerTextDirectory <answerTextDirectory>   directory containing answer html files
+         -ain,--answerInput <answerInput>                    input csv file containing answers data
+         -aout,--answerOutput <answerOutput>                 filename and location for the answer store population data
+         -qin,--questionInput <questionInput>                input csv file containing questions and labels
+         -qout,--questionOutput <questionOutput>             filename and location for the classifier training data
 	```  
-  4. Replace the sample JSON files with your own files. The sample `answers.json` and `training.json` files are in the `questions-with-classifier-ega-war > src > main > resources` directory.
+  5. Replace the sample training.json with your own file. It can be found in the `questions-with-classifier-ega-war > src > main > resources` directory.  The answers.json file can be used to [Populate the answer store by using curl](#stage-4-populate-the-answer-store).
 
 **What to do next**
 
@@ -282,7 +291,7 @@ Use your JSON files to train the classifier and populate the answer store.
 	* [Populate the answer store by using curl](#stage-4-populate-the-answer-store)
   * Use Eclipse
     * [Train the classifier in Eclipse](#training-the-classifier-in-eclipse)
-	* [Populate the answer store in Eclipse](#populating-the-answer-store)
+	* [Populate the answer store in Eclipse](#populating-the-answer-store-in-eclipse)
 
 ***
 

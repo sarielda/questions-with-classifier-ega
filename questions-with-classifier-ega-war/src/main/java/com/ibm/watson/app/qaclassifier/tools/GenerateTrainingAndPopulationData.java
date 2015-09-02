@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -36,19 +35,18 @@ import org.apache.commons.csv.CSVRecord;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ibm.watson.app.qaclassifier.rest.model.ManagedAnswer;
-import com.ibm.watson.app.qaclassifier.rest.model.ManagedAnswer.TypeEnum;
 import com.ibm.watson.app.common.services.nlclassifier.model.NLClassifierTrainingData;
 import com.ibm.watson.app.qaclassifier.util.rest.MessageKey;
 
 /**
  * This is a tool/utility class that reads in both an answer.csv file and a questions.csv file and generates
- * the classifier training json file and populates the answer store for the application.  The 2 are generated
+ * the classifier training json file and a json file for populating the answer store.  The 2 are generated
  * together to make sure that they are in sync and that every class in the training file has an associated answer 
  * in the answer store.
  * 
  * The CSV formats expected are:
  * questions.csv: QuestionText, LabelId
- * answers.csv: LabelId, AnswerValue, CanonicalQuestion
+ * answers.csv: LabelId, CanonicalQuestion
  * 
  * The LabelId values should match between the 2 files, any LabelIds in the questions.csv that do not appear in the
  * answers.csv will NOT be output in the training file.  Any answers in the answers.csv that do not have an AnswerValue (blank)
@@ -129,15 +127,17 @@ public class GenerateTrainingAndPopulationData {
 	private static final String QUESTION_INPUT = "qin", QUESTION_INPUT_LONG = "questionInput";
 	private static final String QUESTION_OUTPUT = "qout", QUESTION_OUTPUT_LONG = "questionOutput";
 	private static final String ANSWER_INPUT = "ain", ANSWER_INPUT_LONG = "answerInput";
+	private static final String ANSWER_TEXT_DIR = "adir", ANSWER_TEXT_DIR_LONG = "answerTextDirectory";
     private static final String ANSWER_OUTPUT = "aout", ANSWER_OUTPUT_LONG = "answerOutput";
 	
 	// the input and output files that we need
     static File questionInput = null;
     static File questionOutput = null;
     static File answerInput = null;
+    static File answerTextDirectory = null;
     static File answerOutput = null;
     
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 	    System.out.println(MessageKey.AQWQAC20007I_starting_generate_training_and_populating.getMessage().getFormattedMessage());
 	    
 		// handle reading the command line parameters and initializing the files
@@ -145,7 +145,7 @@ public class GenerateTrainingAndPopulationData {
 	    System.out.println(MessageKey.AQWQAC20008I_cmd_line_param_read.getMessage().getFormattedMessage());
 	    
 	    // process the answers input file and create the in-memory store for it
-	    List<ManagedAnswer> answers = readAnswerInput();
+	    List<ManagedAnswer> answers = PopulateAnswerStore.loadAnswerStore(answerInput.getPath(), answerTextDirectory.getPath());
 	    if( answers == null || answers.size() == 0 ) {
 	        System.err.println(MessageKey.AQWQAC24010E_answer_store_unable_to_load.getMessage().getFormattedMessage());
 	        System.exit(0);
@@ -160,76 +160,15 @@ public class GenerateTrainingAndPopulationData {
 	    }
         System.out.println(MessageKey.AQWQAC24005I_question_input_file_read.getMessage().getFormattedMessage());
 	    
-        try {
-            // write the answer store population file
-            // create the gson object that is doing all the writing
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            writeGSON(gson.toJson(answers), answerOutput);
-            System.out.println(MessageKey.AQWQAC24006I_answer_output_file_written.getMessage().getFormattedMessage());
-        } 
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+        // write the answer store population file
+        // create the gson object that is doing all the writing
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        writeGSON(gson.toJson(answers), answerOutput);
+        System.out.println(MessageKey.AQWQAC24006I_answer_output_file_written.getMessage().getFormattedMessage());
 	    
-	    try {
-	        // write the classifier training file
-            writeGSON(training.toJson(), questionOutput);
-            System.out.println(MessageKey.AQWQAC24007I_training_data_file_written.getMessage().getFormattedMessage());
-        } 
-	    catch (IOException e) {
-            e.printStackTrace();
-        }
-	}
-
-	/**
-	 * Reads in the answer input file and creates a POJO for each answer it finds.  If the answer has no value
-	 * it is skipped.
-	 * 
-	 * @return AnswerStore - full POJO of the answer store read from the file
-	 */
-	private static List<ManagedAnswer> readAnswerInput() {
-	    List<ManagedAnswer> store = null;
-	    
-	    try (
-	       FileReader reader = new FileReader(answerInput);
-	       CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL);
-	    ){
-	        // read in the csv file and get the records
-	        List<CSVRecord> records = parser.getRecords();
-	        
-	        // now we can create the answer store because we have read the records
-	        store = new ArrayList<ManagedAnswer>();
-	        for( CSVRecord r : records ) {
-	            // order is: LabelId, AnswerValue, CanonicalQuestion
-	            
-	            // check for AnswerValue first, if not there, skip
-	            String text = r.get(1);
-	            if( text == null || text.isEmpty() ) {
-	                continue;
-	            }
-	            
-	            // create the answer pojo
-	            ManagedAnswer answer = new ManagedAnswer();
-	            answer.setClassName(r.get(0));
-	            answer.setText(r.get(1));
-	            answer.setCanonicalQuestion(r.get(2));
-	            answer.setType(TypeEnum.TEXT);
-	            
-	            // add to the answer store only if there is answer text
-	            if( answer.getText().isEmpty() ) {
-	            	
-                  System.out.println(MessageKey.AQWQAC20007I_answer_text_is_empty_for_entry_2.getMessage(answer.getClassName(), answer.getCanonicalQuestion()).getFormattedMessage());  
-	            }
-	            else {
-                  store.add(answer);
-	            }
-	        }
-	    }
-	    catch(Exception e) {
-	        e.printStackTrace();
-	    }
-	    
-        return store;
+        // write the classifier training file
+        writeGSON(training.toJson(), questionOutput);
+        System.out.println(MessageKey.AQWQAC24007I_training_data_file_written.getMessage().getFormattedMessage());
 	}
 	
 	/**
@@ -317,9 +256,10 @@ public class GenerateTrainingAndPopulationData {
         Option questionInputOption = createOption(QUESTION_INPUT, QUESTION_INPUT_LONG, true, "input csv file containing questions and labels", true, QUESTION_INPUT_LONG);
         Option questionOutputOption = createOption(QUESTION_OUTPUT, QUESTION_OUTPUT_LONG, true, "filename and location for the classifier training data", true, QUESTION_OUTPUT_LONG);
         Option answerInputOption = createOption(ANSWER_INPUT, ANSWER_INPUT_LONG, true, "input csv file containing answers data", true, ANSWER_INPUT_LONG);
+        Option answerDirectoryOption = createOption(ANSWER_TEXT_DIR, ANSWER_TEXT_DIR_LONG, true, "directory containing answer html files", true, ANSWER_TEXT_DIR_LONG);
         Option answerOutputOption = createOption(ANSWER_OUTPUT, ANSWER_OUTPUT_LONG, true, "filename and location for the answer store population data", true, ANSWER_OUTPUT_LONG);
         
-        final Options options = buildOptions(questionInputOption, questionOutputOption, answerInputOption, answerOutputOption);
+        final Options options = buildOptions(questionInputOption, questionOutputOption, answerInputOption, answerDirectoryOption, answerOutputOption);
 
         CommandLine cmd;
         try {
@@ -337,10 +277,11 @@ public class GenerateTrainingAndPopulationData {
         final String questionInputFile = cmd.getOptionValue(QUESTION_INPUT).trim();
         final String questionOutputFile = cmd.getOptionValue(QUESTION_OUTPUT).trim();
         final String answerInputFile = cmd.getOptionValue(ANSWER_INPUT).trim();
+        final String answerDirectoryFile = cmd.getOptionValue(ANSWER_TEXT_DIR).trim();
         final String answerOutputFile = cmd.getOptionValue(ANSWER_OUTPUT).trim();
                 
-        // make sure we have all 4 parameters
-        if( questionInputFile.isEmpty() || questionOutputFile.isEmpty() || answerInputFile.isEmpty() || answerOutputFile.isEmpty() ) {
+        // make sure we have all 5 parameters
+        if( questionInputFile.isEmpty() || questionOutputFile.isEmpty() || answerInputFile.isEmpty() || answerDirectoryFile.isEmpty() || answerOutputFile.isEmpty() ) {
             throw new IllegalArgumentException(MessageKey.AQWQAC14200E_must_specify_4_files.getMessage().getFormattedMessage());
             
         }
@@ -355,6 +296,12 @@ public class GenerateTrainingAndPopulationData {
         answerInput = new File(answerInputFile);
         if( !answerInput.exists() ) {
             throw new IllegalArgumentException(MessageKey.AQWQAC14201E_file_does_not_exist_1.getMessage(answerInput.getAbsolutePath()).getFormattedMessage());
+        }
+        
+        // make sure the answer text directory exists
+        answerTextDirectory = new File(answerDirectoryFile);
+        if( !answerTextDirectory.exists() ) {
+            throw new IllegalArgumentException(MessageKey.AQWQAC14201E_file_does_not_exist_1.getMessage(answerTextDirectory.getAbsolutePath()).getFormattedMessage());
         }
         
         // make sure we can create the question output file
