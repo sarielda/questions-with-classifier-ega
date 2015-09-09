@@ -89,6 +89,29 @@
               </systemProperties>
             </configuration>
           </execution>
+          <execution>
+            <id>generate-training-and-answers-json</id>
+            <!-- Might make more sense in generate-resources, but we have to wait for the class to be compiled. -->
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <mainClass>com.ibm.watson.app.qaclassifier.tools.GenerateTrainingAndPopulationData</mainClass>
+              <arguments>
+                <argument>--questionInput</argument>
+                <argument>${project.basedir}/src/main/resources/questions.csv</argument>
+                <argument>--questionOutput</argument>
+                <argument>${project.basedir}/src/main/resources/training.json</argument>
+                <argument>--answerInput</argument>
+                <argument>${project.basedir}/src/main/resources/answers.csv</argument>
+                <argument>--answerTextDirectory</argument>
+                <argument>${project.basedir}/src/main/resources/answers</argument>
+                <argument>--answerOutput</argument>
+                <argument>${project.build.outputDirectory}/answers.json</argument>
+              </arguments>
+            </configuration>
+          </execution>
         </executions>
         <dependencies>
           <dependency>
