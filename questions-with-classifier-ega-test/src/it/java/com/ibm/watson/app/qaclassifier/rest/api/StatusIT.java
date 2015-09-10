@@ -33,6 +33,7 @@ public class StatusIT {
         get("/api/v1/status")
                 .then().statusCode(200)
                 .and().contentType(ContentType.JSON)
+                .and().header("Access-Control-Allow-Origin", "*")
                 .and().body("status", is("good"));
     }
 }
