@@ -49,7 +49,10 @@ public class AnswerEntity {
     
     @Column(name = "CANONICAL_QUESTION", unique = false, nullable = false)
     private String canonicalQuestion;
-
+    
+    @Column(name = "METADATA", unique = false)
+    private String metadata;
+    
     public String getAnswerClass() {
         return answerClass;
     }
@@ -81,9 +84,17 @@ public class AnswerEntity {
     public void setCanonicalQuestion(String canonicalQuestion) {
         this.canonicalQuestion = canonicalQuestion;
     }
+    
+    public String getMetadata() {
+    	return metadata;
+    }
+    
+    public void setMetadata(String metadata) {
+    	this.metadata = metadata;
+    }
 
     @Override
     public String toString() {
-        return "Answer [answerClass=" + answerClass + ", answerType=" + answerType + ", answerText=" + answerText + "]";
+        return "Answer [answerClass=" + answerClass + ", answerType=" + answerType + ", answerText=" + answerText + ", metadata=" + metadata + "]";
     }
 }

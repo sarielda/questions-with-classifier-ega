@@ -157,7 +157,7 @@ public class AddQuestionsToMockClassifier {
             given().baseUri(url)
                     .auth().basic(user, password)
                     .contentType(ContentType.JSON)
-                    .body(Arrays.asList(new ManagedAnswer(answerClass, TypeEnum.TEXT, answerText, canonicalQuestion)))
+                    .body(Arrays.asList(new ManagedAnswer(answerClass, TypeEnum.TEXT, answerText, canonicalQuestion, "{}")))
                     .log().ifValidationFails()
                     .when().post(ANSWER_STORE_ENDPOINT)
                     .then().statusCode(200)

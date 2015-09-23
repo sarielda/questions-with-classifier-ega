@@ -278,6 +278,7 @@ public class ManageApiImpl extends AbstractRestApiImpl implements ManageApiInter
         answer.setText(entity.getAnswerText());
         answer.setType(ManagedAnswer.TypeEnum.valueOf(entity.getAnswerType().name()));
         answer.setCanonicalQuestion(entity.getCanonicalQuestion());
+        answer.setMetadata(entity.getMetadata());
         return answer;
     }
 
@@ -287,6 +288,7 @@ public class ManageApiImpl extends AbstractRestApiImpl implements ManageApiInter
         entity.setAnswerText(answer.getText());
         entity.setAnswerType(Answer.TypeEnum.valueOf(answer.getType().name()));
         entity.setCanonicalQuestion(answer.getCanonicalQuestion());
+        entity.setMetadata(answer.getMetadata());
         return entity;
     }
 }

@@ -142,7 +142,7 @@ public class PopulateAnswerStore {
         }
 
         // While we are at it, the mocked classifier service adds in "defaultClass", so lets set that too
-        ManagedAnswer defaultAnswer = new ManagedAnswer("defaultClass", TypeEnum.TEXT, "This answer is resolved from the default class", "Sample canonical question");
+        ManagedAnswer defaultAnswer = new ManagedAnswer("defaultClass", TypeEnum.TEXT, "This answer is resolved from the default class", "Sample canonical question", "{}");
         data.add(defaultAnswer);
         
         return data;

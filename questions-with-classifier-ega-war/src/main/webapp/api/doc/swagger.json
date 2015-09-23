@@ -451,6 +451,10 @@
                 "canonicalQuestion": {
                     "type": "string",
                     "description": "The canonical question for this answer"
+                },
+                "metadata": {
+                	"type": "string",
+                	"description": "A key-value mapping of metadata"
                 }
             }
         },
