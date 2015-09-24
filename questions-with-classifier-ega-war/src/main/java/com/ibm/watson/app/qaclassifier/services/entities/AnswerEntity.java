@@ -15,12 +15,17 @@
 
 package com.ibm.watson.app.qaclassifier.services.entities;
 
+import java.util.Map;
+
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -50,6 +55,12 @@ public class AnswerEntity {
     @Column(name = "CANONICAL_QUESTION", unique = false, nullable = false)
     private String canonicalQuestion;
 
+    @ElementCollection
+    @MapKeyColumn(name = "METADATA_KEY")
+    @Column(name = "METADATA_VALUE")
+    @CollectionTable(name="METADATA")
+    private Map<String, String> metadata;
+    
     public String getAnswerClass() {
         return answerClass;
     }
@@ -82,8 +93,16 @@ public class AnswerEntity {
         this.canonicalQuestion = canonicalQuestion;
     }
 
+    public Map<String, String> getMetadata() {
+    	return metadata;
+    }
+    
+    public void setMetadata(Map<String, String> metadata) {
+    	this.metadata = metadata;
+    }
+    
     @Override
     public String toString() {
-        return "Answer [answerClass=" + answerClass + ", answerType=" + answerType + ", answerText=" + answerText + "]";
+        return "Answer [answerClass=" + answerClass + ", answerType=" + answerType + ", answerText=" + answerText + ", metadata=" + metadata + "]";
     }
 }
