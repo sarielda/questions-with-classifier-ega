@@ -26,6 +26,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.not;
@@ -37,6 +38,7 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.ClassRule;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.ibm.watson.app.qaclassifier.rest.model.ManagedAnswer;
 import com.ibm.watson.app.qaclassifier.rest.model.ManagedAnswer.TypeEnum;
@@ -61,6 +63,7 @@ public class ManageApiIT {
         answer.setType(TypeEnum.TEXT);
         answer.setText("The text of the unknown answer");
         answer.setCanonicalQuestion("The canonical question for the unknown answer");
+        answer.setMetadata(ImmutableMap.of("a", "b"));
         ManagedAnswer[] answers = {answer};
         String json = new Gson().toJson(answers);
 
@@ -76,7 +79,8 @@ public class ManageApiIT {
                 .and().body("className", is("someunknownclass"))
                 .and().body("type", is("TEXT"))
                 .and().body("text", is("The text of the unknown answer"))
-                .and().body("canonicalQuestion", is("The canonical question for the unknown answer"));
+                .and().body("canonicalQuestion", is("The canonical question for the unknown answer"))
+                .and().body("metadata", hasEntry("a", "b"));
 
         delete("/api/v1/manage/answer/someunknownclass")
                 .then().statusCode(200);
@@ -98,6 +102,7 @@ public class ManageApiIT {
         answer.setType(TypeEnum.TEXT);
         answer.setText(answerText);
         answer.setCanonicalQuestion("The canonical question for the long answer");
+        answer.setMetadata(ImmutableMap.of("a", "b"));
         ManagedAnswer[] answers = {answer};
         String json = new Gson().toJson(answers);
 
@@ -113,7 +118,8 @@ public class ManageApiIT {
                 .and().body("className", is("longanswer"))
                 .and().body("type", is("TEXT"))
                 .and().body("text", is(answerText))
-                .and().body("canonicalQuestion", is("The canonical question for the long answer"));
+                .and().body("canonicalQuestion", is("The canonical question for the long answer"))
+                .and().body("metadata", hasEntry("a", "b"));
 
         delete("/api/v1/manage/answer/longanswer")
                 .then().statusCode(200);

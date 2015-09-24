@@ -92,7 +92,6 @@ public class AnswerEntity {
     public void setCanonicalQuestion(String canonicalQuestion) {
         this.canonicalQuestion = canonicalQuestion;
     }
-    
 
     public Map<String, String> getMetadata() {
     	return metadata;
