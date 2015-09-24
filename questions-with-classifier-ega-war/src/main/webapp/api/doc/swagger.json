@@ -453,8 +453,11 @@
                     "description": "The canonical question for this answer"
                 },
                 "metadata": {
-                	"type": "string",
-                	"description": "A key-value mapping of metadata"
+                	"type": "object",
+                	"description": "String to string key-value mappings for metadata information",
+                	"additionalProperties": {
+                		"type": "string"
+                	}
                 }
             }
         },

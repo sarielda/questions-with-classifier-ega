@@ -20,6 +20,7 @@ import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -141,8 +142,10 @@ public class PopulateAnswerStore {
             a.setText(formattedText);
         }
 
+        Map<String, String> metadata = com.google.common.collect.ImmutableMap.of("a", "b");
+        
         // While we are at it, the mocked classifier service adds in "defaultClass", so lets set that too
-        ManagedAnswer defaultAnswer = new ManagedAnswer("defaultClass", TypeEnum.TEXT, "This answer is resolved from the default class", "Sample canonical question", "{}");
+        ManagedAnswer defaultAnswer = new ManagedAnswer("defaultClass", TypeEnum.TEXT, "This answer is resolved from the default class", "Sample canonical question", metadata);
         data.add(defaultAnswer);
         
         return data;

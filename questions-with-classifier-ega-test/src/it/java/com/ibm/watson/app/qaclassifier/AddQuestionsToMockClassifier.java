@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.cli.CommandLine;
@@ -152,12 +153,14 @@ public class AddQuestionsToMockClassifier {
                 .contentType(ContentType.JSON)
                 .when().get(ANSWER_STORE_ENDPOINT + "/" + answerClass)
                 .thenReturn().statusCode();
+        
+        Map<String, String> metadata = com.google.common.collect.ImmutableMap.of("a", "b");
 
         if (statusCode == 404) {
             given().baseUri(url)
                     .auth().basic(user, password)
                     .contentType(ContentType.JSON)
-                    .body(Arrays.asList(new ManagedAnswer(answerClass, TypeEnum.TEXT, answerText, canonicalQuestion, "{}")))
+                    .body(Arrays.asList(new ManagedAnswer(answerClass, TypeEnum.TEXT, answerText, canonicalQuestion, metadata)))
                     .log().ifValidationFails()
                     .when().post(ANSWER_STORE_ENDPOINT)
                     .then().statusCode(200)
