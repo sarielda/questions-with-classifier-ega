@@ -32,6 +32,7 @@ import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -63,7 +64,7 @@ public class ManageApiIT {
         answer.setType(TypeEnum.TEXT);
         answer.setText("The text of the unknown answer");
         answer.setCanonicalQuestion("The canonical question for the unknown answer");
-        answer.setMetadata(ImmutableMap.of("a", "b"));
+        answer.setMetadata(new HashMap<String, String>());
         ManagedAnswer[] answers = {answer};
         String json = new Gson().toJson(answers);
 
@@ -80,7 +81,7 @@ public class ManageApiIT {
                 .and().body("type", is("TEXT"))
                 .and().body("text", is("The text of the unknown answer"))
                 .and().body("canonicalQuestion", is("The canonical question for the unknown answer"))
-                .and().body("metadata", hasEntry("a", "b"));
+                .and().body("metadata", is(new HashMap<String, String>()));
 
         delete("/api/v1/manage/answer/someunknownclass")
                 .then().statusCode(200);
