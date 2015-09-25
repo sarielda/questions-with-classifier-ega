@@ -231,7 +231,7 @@ public class ManageApiImpl extends AbstractRestApiImpl implements ManageApiInter
         try {
             trans.begin();
             for (AnswerEntity entity : entities) {
-                em.persist(entity);
+                em.merge(entity);
             }
             trans.commit();
         } finally {

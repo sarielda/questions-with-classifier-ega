@@ -125,6 +125,37 @@ public class ManageApiIT {
         delete("/api/v1/manage/answer/longanswer")
                 .then().statusCode(200);
     }
+    
+    @Test
+    public void test_create_and_recreate_answer() {
+        String answerClass = "createAndRecreateAnswer";
+
+        ensureAnswerDoesNotExist(answerClass);
+
+        ManagedAnswer answer = new ManagedAnswer(answerClass, TypeEnum.TEXT, "answer text", "answer question", new HashMap<String, String>());
+
+        given().contentType(ContentType.JSON)
+                .body(new ManagedAnswer[] {answer})
+                .post("/api/v1/manage/answer")
+                .then().statusCode(200);
+
+        given().pathParam("answerClass", answerClass)
+                .when().get("/api/v1/manage/answer/{answerClass}")
+                .then().statusCode(200)
+                .and().body("text", is("answer text"));
+
+        answer.setText("Modified answer text");
+
+        given().contentType(ContentType.JSON)
+                .body(new ManagedAnswer[] {answer})
+                .post("/api/v1/manage/answer")
+                .then().statusCode(200);
+
+        given().pathParam("answerClass", answerClass)
+                .when().get("/api/v1/manage/answer/{answerClass}")
+                .then().statusCode(200)
+                .and().body("text", is("Modified answer text"));
+    }
 
     @Test
     public void test_get_tracking_events_for_invalid_conversation() {
