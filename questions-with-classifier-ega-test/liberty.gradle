@@ -1,0 +1,108 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+if (! project.hasProperty('libertyHttpPort')) {
+    // Choose a random free port
+    def socket = new ServerSocket(0)
+    ext.libertyHttpPort = socket.getLocalPort().toString()
+    socket.close();
+}
+
+project.ext.appUrl = "http://localhost:${ext.libertyHttpPort}"
+def derbyLibDir = "${project.buildDir}/lib/derby"
+
+
+liberty {
+    install {
+        licenseCode = 'L-MCAO-9SYMVC'
+        version = '8.5.5_05'
+        baseDir = project.projectDir
+    }
+    
+    wlpDir = "${install.baseDir}/wlp"
+    
+    deploy {
+        file = "${war.destinationDir}/${war.archiveName}"
+    }
+}
+
+def libertyServerDir = "${liberty.wlpDir}/usr/servers/${liberty.serverName}"
+
+task maybeLibertyCreate {
+    if (! new File(libertyServerDir).exists()) {
+        dependsOn libertyCreate
+    }
+    dependsOn installLiberty
+}
+
+task configureLiberty(dependsOn: maybeLibertyCreate) << {
+    copy {
+        from('src/it/resources') {
+            include 'server.mocked.env'
+        }
+        into libertyServerDir
+        filter(ReplaceTokens, tokens: ['liberty.http.port': project.ext.libertyHttpPort])
+        rename { 'server.env' }
+    }
+    
+    copy {
+        from('src/it/resources') {
+            include 'server.xml'
+        }
+        into libertyServerDir
+    }
+    
+    copy {
+        from configurations.testCompile.files { it.group == 'org.apache.derby' }
+        into derbyLibDir
+        rename ~/(\w)-[0-9.]+\.jar/, '$1.jar'
+    }
+    
+    def props = new Properties()
+
+    props.setProperty('httpPort', project.ext.libertyHttpPort)
+    props.setProperty('derbyLibraryDir', derbyLibDir)
+    props.setProperty('dbServiceName', dbServiceName)
+    props.setProperty('applicationWar', project.ext.warProj.war.outputs.files.getAsPath())
+
+    def propFile = new File("${libertyServerDir}/bootstrap.properties")
+    propFile.createNewFile()
+    props.store(propFile.newWriter(), null)
+}
+
+libertyStart {
+    dependsOn project.ext.warProj.war, configureLiberty
+}
+
+deploy {
+    dependsOn war, libertyStart
+}
+
+task setupMockClassifier(type: JavaExec, dependsOn: [deploy]) {
+    classpath = sourceSets.test.runtimeClasspath
+    main = 'com.ibm.watson.app.qaclassifier.AddQuestionsToMockClassifier'
+    args = ['-f', '/training.json',
+            '-l', appUrl,
+            '-u', manageApiUser,
+            '-p', manageApiPassword]
+}
+
+test {
+    include '**/*IT.class'
+    exclude "**/selenium"
+    jvmArgs restAssuredJvmArgs
+    maxParallelForks = 20
+    systemProperties = [
+        'app.url': appUrl,
+        'derby.stream.error.file': "${project.buildDir}/derby.log",
+        'manage.api.password': manageApiPassword
+    ]
+    
+    testLogging {
+        events 'started'
+    }
+    
+    dependsOn populateAnswerStore, setupMockClassifier, enhanceJPAClasses
+    finalizedBy libertyStop
+}
+
+populateAnswerStore.dependsOn(deploy)

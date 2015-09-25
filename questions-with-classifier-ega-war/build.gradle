@@ -1,0 +1,137 @@
+plugins {
+  id "com.moowork.node" version "0.10"
+}
+apply plugin: 'war'
+
+jar.enabled = true
+description = ''
+
+configurations {
+    codeGen
+}
+
+dependencies {
+    compile 'org.apache.logging.log4j:log4j-core:2.1'
+    compile 'com.google.inject:guice:3.0'
+    compile 'commons-cli:commons-cli:1.2'
+    compile('com.ibm.watson.app.gallery:framework-ega-infra:1.0.2-SNAPSHOT') {
+        exclude(module: 'junit')
+    }
+    compile('com.wordnik:swagger-jaxrs:1.5.1-M1') {
+        exclude(module: 'guava')
+    }
+    compile('org.slf4j:slf4j-jdk14:1.7.7') {
+        exclude(module: 'slf4j-api')
+    }
+    compile 'com.google.code.gson:gson:2.3'
+    compile 'commons-dbcp:commons-dbcp:1.4'
+    compile 'javax.ws.rs:jsr311-api:1.1.1'
+    
+    testCompile 'com.ibm.watson.app.gallery:framework-ega-infra:1.0.2-SNAPSHOT:tests'
+    
+    codeGen 'com.ibm.watson.app.gallery:framework-ega-codegen:1.0.2-SNAPSHOT'
+    
+}
+
+sourceSets {
+    swagger {
+        java {
+            srcDir 'build/generated-sources/src/main/java'
+        }
+    }
+}
+
+task generateSources(type: JavaExec) {
+    inputs.file 'src/main/webapp/api/doc/swagger.json'
+    outputs.dir 'build/generated-sources'
+    
+    classpath = project.configurations.codeGen
+    main = 'com.wordnik.swagger.codegen.Codegen'
+    args = ['-i', 'src/main/webapp/api/doc/swagger.json',
+            '-l', 'watson-app-jaxrs',
+            '-o', 'build/generated-sources']
+    systemProperties = ['com.ibm.watson.app.common.codegen.config': 'src/main/resources/watson-app-codegen.properties']
+}
+
+compileJava {
+    dependsOn generateSources
+    source sourceSets.main.java, sourceSets.swagger.java
+}
+
+task generateTrainingAndPopulationData(type: JavaExec, dependsOn:[classes]) {
+    inputs.files 'src/main/resources/questions.csv', 'src/main/resources/training.json', 'src/main/resources/answers.csv'
+    inputs.dir 'src/main/resources/answers'
+    outputs.files "${sourceSets.main.output.classesDir}/answers.json"
+    
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.ibm.watson.app.qaclassifier.tools.GenerateTrainingAndPopulationData'
+    args = ['--questionInput',       'src/main/resources/questions.csv',
+            '--questionOutput',      'src/main/resources/training.json',
+            '--answerInput',         'src/main/resources/answers.csv',
+            '--answerTextDirectory', 'src/main/resources/answers',
+            '--answerOutput',        "${sourceSets.main.output.classesDir}/answers.json"]
+}
+
+node {
+    version = '0.12.2'
+    npmVersion = '2.7.6'
+    download = true
+    workDir = file('node')
+    nodeModulesDir = file('node_modules')
+}
+
+npmInstall {
+    doFirst {
+        mkdir('node_modules')
+    }
+}
+
+task bower(type: NodeTask, dependsOn: npmInstall) {
+    inputs.file 'bower.json'
+    outputs.dir 'bower_components'
+    
+    script = file('node_modules/bower/bin/bower')
+    args   = ['install']
+}
+
+task gulp(type: NodeTask, dependsOn: bower) {
+    inputs.dir 'src/main/webapp/dev'
+    outputs.dir 'src/main/webapp/js'
+    outputs.dir 'src/main/webapp/css'
+    
+    script = file('node_modules/gulp/bin/gulp.js')
+}
+
+task karma(type: NodeTask, dependsOn: gulp) {
+    script = file('node_modules/karma/bin/karma')
+    args   = ['start', 'src/test/javascript/karma.conf.js']
+}
+
+war {
+    archiveName = 'questions-with-classifier-ega-war.war'
+    excludes = ['dev', 'bower_components']
+    
+    webInf {
+        from('src/main/webapp/api/doc') {
+            include 'swagger.json'
+            into 'classes'
+        }
+    }
+    
+    dependsOn generateTrainingAndPopulationData, test, karma
+}
+// No other easy way to exclude resources from classpath.
+// See https://issues.gradle.org/browse/GRADLE-1360
+war.rootSpec.exclude "answers"
+
+task deployZip(type: Zip, dependsOn:[war]) {
+    from 'deploy'
+    from('build/libs') {
+        include 'questions-with-classifier-ega-war.war'
+        into 'wlp/usr/servers/defaultServer/apps'
+    }
+}
+
+artifacts {
+    archives deployZip
+}

@@ -1,0 +1,6 @@
+rootProject.name = 'questions-with-classifier-ega'
+include ':questions-with-classifier-ega-war'
+include ':questions-with-classifier-ega-test'
+
+project(':questions-with-classifier-ega-war').projectDir = "$rootDir/questions-with-classifier-ega-war" as File
+project(':questions-with-classifier-ega-test').projectDir = "$rootDir/questions-with-classifier-ega-test" as File

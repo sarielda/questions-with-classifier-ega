@@ -1,0 +1,92 @@
+
+if (! project.hasProperty('bluemixUser')) {
+    project.ext.bluemixUser = System.console().readLine('\nBluemix username (add -PbluemixUser=[username] to suppress this message) : ')
+}
+if (! project.hasProperty('bluemixPassword')) {
+    project.ext.bluemixPassword = System.console().readPassword('\nBluemix password (add -PbluemixPassword=[password] to suppress this message) : ').toString()
+}
+if (! project.hasProperty('bluemixApp')) {
+    project.ext.bluemixApp = System.console().readLine('\nBluemix app name (add -PbluemixApp=[app name] to suppress this message) : ')
+}
+
+cloudfoundry {    
+    target = 'https://api.stage1.ng.bluemix.net'
+    space  = 'WGA'
+    organization    = 'Watson-Platform-CSF-Dev'
+    username = project.ext.bluemixUser
+    password = project.ext.bluemixPassword
+    application  = project.ext.bluemixApp
+    file = warProj.deployZip.outputs.files.getSingleFile()
+    env = [
+        'MANAGE_API_PASSWORD': manageApiPassword,
+        'SERVICES_OVERRIDE'  : """{
+            "natural_language_classifier": [
+                {
+                    "credentials": {
+                        "url": "https://gateway.watsonplatform.net/natural-language-classifier/api",
+                        "username": "de51eb5c-415b-4683-88e1-1a524910ca87",
+                        "password": "z62AiRziCQMM"
+                    },
+                    "plan": "standard", 
+                    "name": "app-classifier-bluemix-labs", 
+                    "label": "natural_language_classifier"
+                }
+            ]
+        }"""
+    ]
+    services {
+        'questions-on-classifier-ega-classifier-GA' {
+            label = 'natural_language_classifier'
+            plan  = 'free'
+        }
+        'questions-with-classifier-ega-db' {
+            label = 'sqldb'
+            plan  = 'sqldb_free'
+        }
+    }
+}
+
+ext.appUrl = "https://${cloudfoundry.application}.stage1.mybluemix.net"
+
+cfPush {
+    dependsOn(warProj.deployZip)
+    doFirst {
+        println("Checking creds again: ${cloudfoundry.username}:${cloudfoundry.password}")
+    }
+}
+
+test {
+    include '**/*IT.class'
+    exclude "**/UserTrackingServiceIT.class"
+    maxParallelForks = 20
+    jvmArgs restAssuredJvmArgs
+    systemProperties = [
+        'app.url': project.ext.appUrl,
+        'manage.api.password': manageApiPassword,
+        'selenium.grid.url': 'http://wd-seleniumGS01.swg.usma.ibm.com:4444/wd/hub'
+    ]
+    testLogging {
+        events 'started'
+    }
+    
+    dependsOn populateAnswerStore
+}
+
+task logScan(type:Test, dependsOn: test) {
+    include "**/ScanLogs.class"
+    jvmArgs restAssuredJvmArgs
+    systemProperties = [
+        'bluemix.user': cloudfoundry.username,
+        'bluemix.password': cloudfoundry.password,
+        'bluemix.server.api.url': cloudfoundry.target,
+        'bluemix.org': cloudfoundry.organization,
+        'bluemix.space': cloudfoundry.space,
+        'bluemix.appname': cloudfoundry.application
+    ]
+    testLogging {
+        events 'started'
+    }
+}
+
+check.dependsOn(logScan)
+populateAnswerStore.dependsOn(cfPush)

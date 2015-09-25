@@ -1,0 +1,126 @@
+import java.net.ServerSocket
+import org.apache.tools.ant.filters.ReplaceTokens
+
+apply plugin: 'war'
+apply plugin: 'liberty'
+apply plugin: 'cloudfoundry'
+
+evaluationDependsOn(':questions-with-classifier-ega-war')
+
+ext.dbServiceName     = 'questions-with-classifier-ega-db'
+ext.manageApiUser     = 'apiuser'
+ext.manageApiPassword = 'passw0rd'
+
+def itestEnv = System.getProperty('itestEnv', 'liberty')
+
+ext.restAssuredJvmArgs = []
+if (System.properties['java.vm.vendor'] == 'IBM Corporation') {
+    restAssuredJvmArgs = ['-Xsoftrefthreshold0' , '-Xalwaysclassgc']
+}
+
+ext.warProj = project(':questions-with-classifier-ega-war')
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = 'Sonatype Nexus Snapshots'
+            url = 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
+    }
+	
+    dependencies {
+        classpath 'net.wasdev.wlp.gradle.plugins:liberty-gradle-plugin:1.0-SNAPSHOT'
+        classpath 'org.cloudfoundry:cf-gradle-plugin:1.1.1'
+    }
+}
+
+description = ''
+
+configurations.all {
+    resolutionStrategy {
+        // Reproduce results of maven conflict resolution
+        force 'com.fasterxml.jackson.core:jackson-databind:2.3.3'
+        force 'com.fasterxml.jackson.core:jackson-core:2.3.3'
+        force 'org.javassist:javassist:3.19.0-GA'
+    }
+}
+
+sourceSets {
+    test {
+        java.srcDir file('src/it/java')
+        resources.srcDir file('src/it/resources')
+    }
+}
+
+dependencies {
+    compile warProj
+    compile 'com.ibm.watson.app.gallery:framework-ega-tools:1.0.2-SNAPSHOT'
+    compile 'com.ibm.watson.app.gallery:framework-ega-test:1.0.2-SNAPSHOT'
+    compile 'com.jayway.restassured:rest-assured:2.3.4'
+    compile 'org.apache.openjpa:openjpa:2.2.0'
+    
+    testCompile 'org.seleniumhq.selenium:selenium-java:2.46.0'
+    testCompile 'org.apache.derby:derby:10.10.2.0'
+    testCompile 'org.apache.derby:derbyclient:10.10.2.0'
+    testCompile 'commons-dbcp:commons-dbcp:1.4'
+    testCompile 'org.cloudfoundry:cloudfoundry-client-lib:1.1.1'
+}
+
+processTestResources {
+    from(sourceSets.test.resources.srcDirs) {
+        include 'config/config.properties'
+        filter ReplaceTokens, tokens: [
+            "project.build.directory": project.buildDir.getPath()
+        ]
+    }
+}
+
+task enhanceJPAClasses(dependsOn: warProj.classes) << {
+    copy {
+        from(warProj.sourceSets.main.output.classesDir) {
+            include '**/entities/**/*.class'
+        }
+        into sourceSets.main.output.classesDir
+    }
+    
+    def entityFiles = fileTree(sourceSets.main.output.classesDir).matching {
+        include '**/entities/**/*.class'
+    }
+    
+    ant.taskdef(
+        name : 'openjpac',
+        classpath : sourceSets.main.runtimeClasspath.asPath,
+        classname : 'org.apache.openjpa.ant.PCEnhancerTask'
+    )
+    
+    ant.openjpac(
+        classpath: sourceSets.main.runtimeClasspath.asPath,
+        addDefaultConstructor: true,
+        enforcePropertyRestrictions: true) {
+            entityFiles.addToAntBuilder(ant, 'fileset', FileCollection.AntType.FileSet) 
+        }
+}
+
+task populateAnswerStore(type: JavaExec, dependsOn: classes) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.ibm.watson.app.qaclassifier.tools.PopulateAnswerStore'
+    doFirst {
+        args = ['-f', '/answers.csv',
+                '-d', '/answers',
+                '-l', project.ext.appUrl,
+                '-u', manageApiUser,
+                '-p', manageApiPassword]
+    }
+}
+
+if (itestEnv == 'liberty') {
+    apply from: 'liberty.gradle'
+}
+
+if (itestEnv == 'bluemix') {
+    apply from: 'bluemix.gradle'
+}
+
+
+

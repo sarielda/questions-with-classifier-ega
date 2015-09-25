@@ -10,3 +10,7 @@ questions-with-classifier-ega-war/src/main/webapp/css
 *.log
 .settings
 .classpath
+*/build/
+.gradle/
+questions-with-classifier-ega-test/wlp/
+/gradle-app.setting
