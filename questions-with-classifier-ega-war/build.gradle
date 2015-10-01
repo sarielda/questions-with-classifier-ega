@@ -76,14 +76,6 @@ node {
     version = '0.12.2'
     npmVersion = '2.7.6'
     download = true
-    workDir = file('node')
-    nodeModulesDir = file('node_modules')
-}
-
-npmInstall {
-    doFirst {
-        mkdir('node_modules')
-    }
 }
 
 task bower(type: NodeTask, dependsOn: npmInstall) {
