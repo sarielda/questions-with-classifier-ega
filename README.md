@@ -55,7 +55,8 @@ Additionally, the app requires a populated answer store. The answer store is pop
     
     class --> canonicalQuestion
 	
-Choose whether you want to use sample data or your own data.
+Choose whether you want to use sample data or your own data.  
+*Note that this application will not return any answers if there is not enough confidence from the classifier to do so*
 
 #### **Sample data**
 The sample data is in the `questions.csv` and `answers.csv` files in the `questions-with-classifier-ega-war > src > main > resources` directory. To use the sample data, go to [Stage 3: Train the classifier](#stage-3-train-the-classifier). 
