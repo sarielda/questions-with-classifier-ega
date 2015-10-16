@@ -302,15 +302,17 @@ Use your JSON files to train the classifier and populate the answer store.
 If you completed the previous stages, the app is deployed without security around any of the internal API endpoints. No security is acceptable for development but not for production, particularly for the `/manage` endpoint, which allows access to the answer store.
 
 To deploy the app with security enabled, complete these steps:
+
 1. Find the .zip file that contains the .war and a server.xml with security configured by running the following command:
 
     ```
-    cd /questions-with-classifier-ega/questions-with-classifier-ega-war/target
+    cd questions-with-classifier-ega/questions-with-classifier-ega-war/target
     ```
+    
 2. Re-run the following `cf push` command:
 
     ```
-    cf push <yourAppName> -p questions-with-classifier-ega-war.war
+    cf push <yourAppName> -p questions-with-classifier-ega-war.zip
     ```
 
 3. In your Bluemix application, define the following environment variable and set the value to the password you want:
