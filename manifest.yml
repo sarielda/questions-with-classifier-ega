@@ -11,10 +11,10 @@ declared-services:
     plan: sqldb_free
 
 applications:
-- name: questions-with-classifier
-  memory: 512M
+- memory: 512M
   path: questions-with-classifier-ega-war/target/questions-with-classifier-ega-war.zip
-  host: questions-with-classifier
   services:
   - questions-classifier
   - questions-db
+  env:
+    JBP_CONFIG_LIBERTY: 'app_archive: {features: [jsp-2.2, jaxrs-1.1, jdbc-4.0, jpa-2.0]}'
