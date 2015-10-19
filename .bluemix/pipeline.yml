@@ -53,7 +53,7 @@ stages:
       application: ${CF_APP}
     script: |
       #!/bin/bash
-      cf push "${CF_APP}" -p questions-with-classifier-ega-war.zip
+      cf push "${CF_APP}" -p questions-with-classifier-ega-war.war
 
       # View logs
       #cf logs "${CF_APP}" --recent
