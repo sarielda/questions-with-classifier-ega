@@ -173,7 +173,8 @@ In this stage, manually create your application in Bluemix, bind the necessary s
         ```
         cf login -u <yourUsername> -o <yourOrg> -s <yourSpace>
         ```
-      5. Deploy the app to Bluemix by running the following command. Replace <yourAppName> with the name of your app.
+      5. **Temporary**  In manifest.yml, change any of the characters ```&#58``` to ```:```
+      6. Deploy the app to Bluemix by running the following command. Replace <yourAppName> with the name of your app.
         
         ```
         cf push <yourAppName> -p questions-with-classifier-ega-war.war
