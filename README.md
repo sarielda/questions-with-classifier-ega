@@ -29,20 +29,86 @@ To get started, complete each of the following stages in order:
 
 ***
 ### Stage 1: Clone, build, and deploy
-[![Deploy to Bluemix](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?repository=https://github.com/watson-developer-cloud/questions-with-classifier-ega)
 
-Clicking the **Deploy to Bluemix** button does the following steps automatically:
+#### Cloning and building the project yourself
+  
+  1. Clone the framework-ega repository by issuing one of the following commands:
+     ```
+     git clone https://github.com/watson-developer-cloud/framework-ega.git
+     ```
+     ```
+     git clone git@github.com:watson-developer-cloud/framework-ega.git
+     ```
 
-1. Prompts you to log in to Bluemix or to create an account.
-2. Creates a Bluemix DevOps Services project and initializes a new Git repository.
-3. Clones the questions-with-classifier-ega project into the Git repository.
-4. Builds the project.
-5. Creates any required Bluemix services.
-6. Deploys the app to Bluemix.
+  2. Run `mvn install` in the root of the framework-ega repository to build and install the components to your local Maven repository.
+  3. Clone the questions-with-classifier-ega repository by issuing one of the following commands:
+     ```
+     git clone https://github.com/watson-developer-cloud/questions-with-classifier-ega.git
+     ```
+     ```
+     git clone git@github.com:watson-developer-cloud/questions-with-classifier-ega.git
+     ```
+        
+  4. Run `mvn install` in the root of the questions-with-classifier-ega repository to build and install the components to your local Maven repository.
 
-The DevOps Services project is set up to automatically deploy changes to Bluemix after you commit new changes to your Git repository.
+  The `questions-with-classifier-ega-war.war` file is in the `/questions-with-classifier-ega/questions-with-classifier-ega-war/target` directory.
 
-The entire process lasts a few minutes. Although the app is deployed when the process is finished, you must complete the following stages to ensure that the app functions correctly.
+***
+
+#### Manually creating Bluemix services and deploying to Bluemix
+In this stage, manually create your application in Bluemix, bind the necessary services to it, and deploy the application code that you built in Stage 1.
+  1. [Log in to Bluemix](https://console.ng.bluemix.net/) and navigate to the Dashboard.
+  2. Create your app.
+	  1. Click **CREATE AN APP**.
+	  2. Select **WEB**.
+      3. Select the starter **Liberty for Java**, and click **CONTINUE**.
+      4. Type a unique name for your app, such as `qaclassifier-sample-app`, and click **Finish**.
+      5. Select **CF Command Line Interface**. If you do not already have it, click **Download CF Command Line Interface** and install it.
+      6. Click **OVERVIEW**.
+  3. Add the Natural Language Classifier service to your app. To use an instance of the service that is bound to another app, skip this step.
+      1. Click **ADD A SERVICE OR API**. 
+      2. Select the **Watson** category, and select the **Natural Language Classifier** service.
+      3. Ensure that your app is specified in the **App** dropdown.
+      4. In the **Service name** field, type a unique name for your service, such as `qaclassifier-sample-classifier`.
+      5. Click **CREATE**. The **Restage Application** window is displayed. 
+      6. Click **RESTAGE** to restage your app.
+  4. Add SQL database service to your app. To use an instance of the service that is bound to another app, skip this step.
+      1. Click **ADD A SERVICE OR API**.
+      2. Select the **Data Management** category, and select the **SQL Database** service.
+      3. Ensure that your app is specified in the **App** dropdown.
+      4. In the **Service name** field, type a unique name for your service, such as `qaclassifier-sample-db`.
+      5. Click **CREATE**. The **Restage Application** window is displayed. 
+      6. Click **RESTAGE** to restage your app.
+  5. Bind instances of services to your app. If this step is not applicable, skip it.
+      1. Click **BIND A SERVICE OR API**.
+	  2. Select the services that you want to bind to your app, and click **ADD**. The **Restage Application** window is displayed. 
+	  3. Click **RESTAGE** to restage your app.
+  6. Deploy the application code that you built in Stage 1 by using the Cloud Foundry commands.
+      1. Open the Command Prompt.
+      2. Navigate to the directory that contains the WAR file you that you generated in the previous section by running the following command:  
+        ```
+        cd /questions-with-classifier-ega/questions-with-classifier-ega-war/target
+        ```
+      3. Connect to Bluemix by running the following command:  
+        ```
+        cf api https://api.ng.bluemix.net
+        ```
+      4. Log in to Bluemix by running the following command. Replace <yourUsername> with your Bluemix id, <yourOrg> with your organization name, and <yourSpace> with your space name.  
+        ```
+        cf login -u <yourUsername> -o <yourOrg> -s <yourSpace>
+        ```
+      5. **Temporary**  In manifest.yml, change any of the characters ```&#58``` to ```:```
+      6. Deploy the app to Bluemix by running the following command. Replace <yourAppName> with the name of your app.  
+        ```
+        cf push <yourAppName> -p questions-with-classifier-ega-war.war
+        ```
+  7. If the app is not started, click **START**.
+  8. To view the home page of the app, open (https://*yourAppName*.mybluemix.net), where *yourAppname* is the specific name of your app. 
+  
+**The app and its bound services are deployed. However, you must complete the remaining setup stages for the app to function correctly.**
+
+If you want to secure the answer store endpoints, see [Deploying with security](#deploying-with-security).
+***
 
 ### Stage 2: Choose which data you want to use
 In this stage, understand the types of data that the app requires and choose whether you want to use sample data or your own data. 
@@ -101,91 +167,6 @@ To see the API that populates the answer store, open https://yourAppName.mybluem
 
 ## Advanced development
 Use the following information to use Eclipse for training the classifier and populating the answer store and to train a classifier on your own data.
-
-### Cloning and building the project yourself
-  If you don't want to use the **Deploy to Bluemix** button, you can clone and build the project yourself by completing the following steps:
-  
-  1. Clone the framework-ega repository by issuing one of the following commands:
-     ```
-     git clone https://github.com/watson-developer-cloud/framework-ega.git
-     ```
-     ```
-     git clone git@github.com:watson-developer-cloud/framework-ega.git
-     ```
-
-  2. Run `mvn install` in the root of the framework-ega repository to build and install the components to your local Maven repository.
-  3. Clone the questions-with-classifier-ega repository by issuing one of the following commands:
-     ```
-     git clone https://github.com/watson-developer-cloud/questions-with-classifier-ega.git
-     ```
-     ```
-     git clone git@github.com:watson-developer-cloud/questions-with-classifier-ega.git
-     ```
-        
-  4. Run `mvn install` in the root of the questions-with-classifier-ega repository to build and install the components to your local Maven repository.
-
-  The `questions-with-classifier-ega-war.war` file is in the `/questions-with-classifier-ega/questions-with-classifier-ega-war/target` directory.
-
-***
-
-### Manually creating Bluemix services and deploying to Bluemix
-In this stage, manually create your application in Bluemix, bind the necessary services to it, and deploy the application code that you built in Stage 1.
-  1. [Log in to Bluemix](https://console.ng.bluemix.net/) and navigate to the Dashboard.
-  2. Create your app.
-	  1. Click **CREATE AN APP**.
-	  2. Select **WEB**.
-      3. Select the starter **Liberty for Java**, and click **CONTINUE**.
-      4. Type a unique name for your app, such as `qaclassifier-sample-app`, and click **Finish**.
-      5. Select **CF Command Line Interface**. If you do not already have it, click **Download CF Command Line Interface** and install it.
-      6. Click **OVERVIEW**.
-  3. Add the Natural Language Classifier service to your app. To use an instance of the service that is bound to another app, skip this step.
-      1. Click **ADD A SERVICE OR API**. 
-      2. Select the **Watson** category, and select the **Natural Language Classifier** service.
-      3. Ensure that your app is specified in the **App** dropdown.
-      4. In the **Service name** field, type a unique name for your service, such as `qaclassifier-sample-classifier`.
-      5. Click **CREATE**. The **Restage Application** window is displayed. 
-      6. Click **RESTAGE** to restage your app.
-  4. Add SQL database service to your app. To use an instance of the service that is bound to another app, skip this step.
-      1. Click **ADD A SERVICE OR API**.
-      2. Select the **Data Management** category, and select the **SQL Database** service.
-      3. Ensure that your app is specified in the **App** dropdown.
-      4. In the **Service name** field, type a unique name for your service, such as `qaclassifier-sample-db`.
-      5. Click **CREATE**. The **Restage Application** window is displayed. 
-      6. Click **RESTAGE** to restage your app.
-  5. Bind instances of services to your app. If this step is not applicable, skip it.
-      1. Click **BIND A SERVICE OR API**.
-	  2. Select the services that you want to bind to your app, and click **ADD**. The **Restage Application** window is displayed. 
-	  3. Click **RESTAGE** to restage your app.
-  6. Deploy the application code that you built in Stage 1 by using the Cloud Foundry commands.
-      1. Open the Command Prompt.
-      2. Navigate to the directory that contains the WAR file you that you generated in the previous section by running the following command:
-      
-        ```
-        cd /questions-with-classifier-ega/questions-with-classifier-ega-war/target
-        ```
-      3. Connect to Bluemix by running the following command:
-      
-        ```
-        cf api https://api.ng.bluemix.net
-        ```
-      4. Log in to Bluemix by running the following command. Replace <yourUsername> with your Bluemix id, <yourOrg> with your organization name, and <yourSpace> with your space name.
-      
-        ```
-        cf login -u <yourUsername> -o <yourOrg> -s <yourSpace>
-        ```
-      5. **Temporary**  In manifest.yml, change any of the characters ```&#58``` to ```:```
-      6. Deploy the app to Bluemix by running the following command. Replace <yourAppName> with the name of your app.
-        
-        ```
-        cf push <yourAppName> -p questions-with-classifier-ega-war.war
-        ```
-  7. If the app is not started, click **START**.
-  8. To view the home page of the app, open (https://*yourAppName*.mybluemix.net), where *yourAppname* is the specific name of your app. 
-  
-**The app and its bound services are deployed. However, you must complete the remaining setup stages for the app to function correctly.**
-
-If you want to secure the answer store endpoints, see [Deploying with security](#deploying-with-security).
-***
 
 ### Training the classifier in Eclipse
 
