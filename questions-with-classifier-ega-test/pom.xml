@@ -140,7 +140,7 @@
                  http://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/wasdev/downloads/wlp/8.5.5.5/lafiles/runtime/en.html
             -->
             <licenseCode>L-MCAO-9SYMVC</licenseCode>
-            <version>8.5.5_05</version>
+            <version>8.5.+</version>
           </install>
         </configuration>
       </plugin>
