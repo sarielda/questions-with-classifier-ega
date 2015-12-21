@@ -14,18 +14,18 @@ def derbyLibDir = "${project.buildDir}/lib/derby"
 liberty {
     install {
         licenseCode = 'L-MCAO-9SYMVC'
-        version = '8.5.5_05'
+        version = '8.5.+'
         baseDir = project.projectDir
     }
     
-    wlpDir = "${install.baseDir}/wlp"
+    installDir = "${install.baseDir}/wlp"
     
     deploy {
         file = "${war.destinationDir}/${war.archiveName}"
     }
 }
 
-def libertyServerDir = "${liberty.wlpDir}/usr/servers/${liberty.serverName}"
+def libertyServerDir = "${liberty.installDir}/usr/servers/${liberty.serverName}"
 
 task maybeLibertyCreate {
     if (! new File(libertyServerDir).exists()) {
