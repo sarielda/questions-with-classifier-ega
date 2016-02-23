@@ -17,4 +17,4 @@ applications:
   - questions-classifier
   - questions-db
   env:
-    JBP_CONFIG_LIBERTY: "app_archive&#58; {features&#58; [jsp-2.2, jaxrs-1.1, jdbc-4.0, jpa-2.0]}"
+    JBP_CONFIG_LIBERTY: "app_archive: {features: [jsp-2.2, jaxrs-1.1, jdbc-4.0, jpa-2.0]}"
