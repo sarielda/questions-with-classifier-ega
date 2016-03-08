@@ -14,7 +14,7 @@ Complete the following instructions to set up these items.
 ## Before you begin
 Ensure that you have the following prerequisites before you start:
   * You need an IBM Bluemix account. If you don't have one, [sign up](https://apps.admin.ibmcloud.com/manage/trial/bluemix.html?cm_mmc=WatsonDeveloperCloud-_-LandingSiteGetStarted-_-x-_-CreateAnAccountOnBluemixCLI). For more information about the process, see [Developing Watson applications with Bluemix](http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/doc/getting_started/gs-bluemix.shtml).
-  * [Java Development Kit](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+  * [Java Development Kit](http://www.oracle.com/technetwork/java/javase/downloads/index.html) (Version 7u49+, or 8u45+)
   * [Apache Maven](https://maven.apache.org/download.cgi) 3.1 or later releases
   * [Git](https://git-scm.com/downloads)
   
