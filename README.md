@@ -58,7 +58,7 @@ To get started, complete each of the following stages in order:
 #### Manually creating Bluemix services and deploying to Bluemix
 In this stage, manually create your application in Bluemix, bind the necessary services to it, and deploy the application code that you built in Stage 1.
   1. [Log in to Bluemix](https://console.ng.bluemix.net/) and navigate to the Dashboard.
-  2. Create your app.
+  2. Create your app.  Make sure it's in the "US South" region.
 	  1. Click **CREATE AN APP**.
 	  2. Select **WEB**.
       3. Select the starter **Liberty for Java**, and click **CONTINUE**.
@@ -74,7 +74,7 @@ In this stage, manually create your application in Bluemix, bind the necessary s
       6. Click **RESTAGE** to restage your app.
   4. Add SQL database service to your app. To use an instance of the service that is bound to another app, skip this step.
       1. Click **ADD A SERVICE OR API**.
-      2. Select the **Data Management** category, and select the **SQL Database** service.
+      2. Select the **Data and Analytics** category, and select the **SQL Database** service.
       3. Ensure that your app is specified in the **App** dropdown.
       4. In the **Service name** field, type a unique name for your service, such as `qaclassifier-sample-db`.
       5. Click **CREATE**. The **Restage Application** window is displayed. 
