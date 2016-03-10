@@ -51,7 +51,7 @@ To get started, complete each of the following stages in order:
         
   4. Run `mvn install` in the root of the questions-with-classifier-ega repository to build and install the components to your local Maven repository.
 
-  The `questions-with-classifier-ega-war.war` file is in the `/questions-with-classifier-ega/questions-with-classifier-ega-war/target` directory.
+  The `questions-with-classifier-ega-war.zip` file is in the `/questions-with-classifier-ega/questions-with-classifier-ega-war/target` directory.
 
 ***
 
@@ -97,17 +97,22 @@ In this stage, manually create your application in Bluemix, bind the necessary s
         ```
         cf login -u <yourUsername> -o <yourOrg> -s <yourSpace>
         ```
-      5. **Temporary**  In manifest.yml, change any of the characters ```&#58``` to ```:```
+      5. Modify `manifest.yml` so the service names match the names you previously chose when creating them.
       6. Deploy the app to Bluemix by running the following command. Replace <yourAppName> with the name of your app.  
         ```
-        cf push <yourAppName> -p questions-with-classifier-ega-war.war
+        cf push <yourAppName> -p questions-with-classifier-ega-war.zip
         ```
   7. If the app is not started, click **START**.
   8. To view the home page of the app, open (https://*yourAppName*.mybluemix.net), where *yourAppname* is the specific name of your app. 
   
 **The app and its bound services are deployed. However, you must complete the remaining setup stages for the app to function correctly.**
 
-If you want to secure the answer store endpoints, see [Deploying with security](#deploying-with-security).
+Before you can modify the application's database, you must set a password.  
+- In your Bluemix application, define the following environment variable and set the value to the password you want:
+
+    ```
+    MANAGE_API_PASSWORD
+    ```
 ***
 
 ### Stage 2: Choose which data you want to use
@@ -279,26 +284,3 @@ Use your JSON files to train the classifier and populate the answer store.
 	* [Populate the answer store in Eclipse](#populating-the-answer-store-in-eclipse)
 
 ***
-
-### Deploying with security
-If you completed the previous stages, the app is deployed without security around any of the internal API endpoints. No security is acceptable for development but not for production, particularly for the `/manage` endpoint, which allows access to the answer store.
-
-To deploy the app with security enabled, complete these steps:
-
-1. Find the .zip file that contains the .war and a server.xml with security configured by running the following command:
-
-    ```
-    cd questions-with-classifier-ega/questions-with-classifier-ega-war/target
-    ```
-    
-2. Re-run the following `cf push` command:
-
-    ```
-    cf push <yourAppName> -p questions-with-classifier-ega-war.zip
-    ```
-
-3. In your Bluemix application, define the following environment variable and set the value to the password you want:
-
-    ```
-    MANAGE_API_PASSWORD
-    ```
