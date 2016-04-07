@@ -7,6 +7,7 @@
         </div>
         <div class="text-container">
             <div class="text-inner-container">
+                <img src="images/og-logo-white.png" style="PADDING-LEFT: 1em; width=50%; height=50%" alt="Ontario Government Logo"/>
                 <div class="horizontal-line">.</div>
                 <div id="screenText"></div>
                 <div id="trainMeText"></div>

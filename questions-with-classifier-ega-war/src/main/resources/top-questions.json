@@ -1,22 +1,18 @@
 [
   {
-  	questionText: "What is the Natural Language Classifier service?",
-  	className: "what_classifier_does"
+  	questionText: "I have a History degree and I'd like to change careers. What are my career options in Ontario? ",
+  	className: "most_required_jobs"
   },
   {
-  	questionText: "Why do I want to use the Natural Language Classifier?",
-  	className: "why_use_classifier"
+  	questionText: "I want to study Nursing but I can't afford full time education. Can you help me find part-time job and training program?",
+  	className: "eo_employment_service"
   },
   {
-  	questionText: "What languages are supported?",
-  	className: "languages_supported"
+  	questionText: "Is Electrician a needed skill in Mississauga?",
+  	className: "electrician_mississauga"
   },
   {
-  	questionText: "How many examples do I need to train the Natural Language Classifier service?",
-  	className: "optimum_number_training_classes"
-  },
-  {
-  	questionText: "What kind of data can I use the Natural Language Classifier on?",
-  	className: "how_classifier_works"
+  	questionText: "I like Mathematics and graduating in 2019. What career options do you suggest?",
+  	className: "math_future"
   }
 ]

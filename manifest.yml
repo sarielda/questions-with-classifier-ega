@@ -3,7 +3,7 @@
 # This is used to automatically create service instances when 
 # an application is deployed using the "Deploy to Bluemix" button.
 declared-services:
-  questions-classifier:
+  og-qaclassifier:
     label: natural_language_classifier
     plan: standard
   questions-db:
@@ -14,7 +14,7 @@ applications:
 - memory: 512M
   path: questions-with-classifier-ega-war/target/questions-with-classifier-ega-war.zip
   services:
-  - questions-classifier
+  - og-qaclassifier
   - questions-db
   env:
     JBP_CONFIG_LIBERTY: "app_archive: {features: [jsp-2.2, jaxrs-1.1, jdbc-4.0, jpa-2.0]}"

@@ -1,45 +1,59 @@
-all_training_data_used,"Does the Natural Language Classifier train using all of the data, or does it partition it in some way?"
-api_documentation,Where can I find documentation on the Natural Language Classifier API?
-billing_and_usage,How many instances of the Natural Language Classifier can I create and what does it cost?
-bluemix_hosted,What OS does the Natural Language Classifier use and how does it relate to IBM Bluemix?
-bluemix_multi_tenant,Is this a multi-tenant service?
-choose_or_change_algorithm,Can I choose from different algorithms or request changes to the existing ones?
-classifier_competitors,What are the competitors to the Natural Language Classifier and how is it differentiated?
-classifier_documentation,Where can I find documentation on the Natural Language Classifier service?
-classifier_not_rule_based,Does the Natural Language Classifier support a combination of NL and rule-based matching techniques currently?
-confidence_threshold,Does the Natural Language Classifier service return answer(s) above a certain confidence threshold?
-contact_support,Who do I contact for issues with Natural Language Classifier?
-deployed_in_bluemix,How do I deploy the Natural Language Classifier service?
-example_use_cases,What is a good use case for the Natural Language Classifier service?
-extend_classifier,Is there a way for me to extend the capabilities of the Natural Language Classifier?
-how_accurate,How accurate is the Natural Language Classifier and have there been any experiments or test results to share to prove it?
-how_classifier_works,How does the Natural Language Classifier work?
-how_to_measure_quality,How do you measure the quality of the Natural Language Classifier?
-how_to_register,How do I register for this Natural Language Classifier service?
-how_to_retrain,How can I retrain and update the model for an existing Natural Language Classifier?
-how_to_train,How do I train a Natural Language Classifier?
-how_to_use,How do I use the Natural Language Classifier?
-improving_classifier,Does the Natural Language Classifier improve with use?
-improving_performance,"If the Natural Language Classifier isn't giving the answers I expect, what do I do?"
-integrate_other_services,What other services should I use and how do I integrate them?
-known_problems,What are the known problems with the Natural Language Classifier?
-languages_supported,Does the Natural Language Classifier work on languages other than english?
-matching_words_in_question_and_class,How many words can not match and still have a question match an existing group?
-misspelling_bad_grammar,"How does the Natural Language Classifier handle misspelled words, bad grammar, improper case, and extra spaces?"
-model_used_in_classification,What models does the Natural Language Classifier use and can I use my own?
-more_samples_produce_better_models,Is two Natural Language Classifiers with smaller training sets better than having one with a bigger training set?
-nlp_features_used,What NLP features does the Natural Language Classifier use?
-optimum_number_training_classes,How many examples do I need to train the Natural Language Classifier service?
-overfitting_regularization,how is  the generalization of the Natural Language Classifier calculated?
-related_or_similar_classes,Can the Natural Language Classifier identify similar or related classes?
-response_to_classify,What is the output of a request to the Natural Language Classifier?
-same_answer_every_time,Does the Natural Language Classifier give the same answer every time?
-short_text_classifier,Why does the Natural Language Classifier return intents instead of answers?
-structured_data,Does the Natural Language Classifier work on structured data?
-time_to_classify_question,How long does it take for Natural Language Classifier to answer the question?
-time_to_train,How long does it take to train a Natural Language Classifier?
-training_class_limit,What is the limit on the number of classes I can use to train the Natural Language Classifier?
-types_of_data_classified,What types of questions can be classified by the Natural Language Classifier?
-what_classifier_does,What is the Natural Language Classifier service?
-what_does_nl_stand_for,What does NL stand for?
-why_use_classifier,Why do I want to use the Natural Language Classifier?
+most_required_jobs,What are the most required jobs in Ontario?
+canada_ont_job_grant,What is the Canada-Ontario Job Grant?
+cojg_training,What kind of training will be covered by the Canada-Ontario Job grant?
+cojg_funding,How much funding is an employer eligible to receive through COJG?
+cojg_apply,How can I apply for a Cana-Ontario Job Grant?
+cojg_employer_role,What kind of role do employers have in the Canada-Ontario Job Grant?
+cojg_employer_eligibiliity,Which employers are eligible for the Canada-Ontario Job Grant?
+cojg_one_year_limit,How long is the the training supported by COJG?
+cojg_administration,Who is administering the COJG?
+cojg_forms,What forms need to be completed throughout the COJG process?
+cojg_employer_more,Can an employer access COJG funds more than once?
+cojg_individual_only,Can an individual apply directly for the COJG grant?
+cojg_eligible_institute,What is a training institution eligible for COJG?
+cojg_apprenticeship,Is in-class apprenticeship training eligible under the COJG?
+cojg_individual_req,What individuals are eligible for the Canada-Ontario Job Grant?
+cojg_and_ontworks,"For individuals who are on Ontario Works, are they able to continue receiving their benefits if taking part in COJG?"
+eo_employment_service,What is Employment Ontario Employment Service?
+canada_100,Who's Canada's top 100 Employers?
+second_career,What is Second Career Program?
+sc_req,Is Second Career Program right for me?
+sc_other_options,"If I don't qualify for Second Career, what other options are available for me?"
+sc_processing_time,What's the processing time for Second Cear applications?
+sc_evaluation,How does the ministry determine the amount of my financial assistance for Second Career skills training?
+sc_with_job,Can I take a temporary job now while applying for Second Career?
+plumbing_ontario,What is the expected demand for the plumbing trade in Ontario?
+electrician_mississauga,Is Electrician a needed skill in Mississauga?
+math_future,I like Mathematics and graduating in 2019. What career options do you suggest?
+es_scarborough,What Employment Service Providers are available in Scarborough?
+es_toronto,What Employment Service Providers are available in Toronto?
+es_mississauga,What Employment Service Providers are available in Mississauga?
+es_brampton,What Employment Service Providers are available in Brampton?
+es_markham,What Employment Service Providers are available in Markham?
+es_richmond_hill,What Employment Service Providers are available in Richmond Hill?
+es_concord,What Employment Service Providers are available in Concord?
+es_aurora,What Employment Service Providers are available in Aurora?
+es_kisweck,What Employment Service Providers are available in Kisweck?
+es_woodbridge,What Employment Service Providers are available in Woodbridge?
+es_stouffville,What Employment Service Providers are available in Stouffville?
+es_newmarket,What Employment Service Providers are available in Newmarket?
+es_suttonwest,What Employment Service Providers are available in Sutton West?
+es_voughan,What Employment Service Providers are available in Voughan?
+es_thornhill,What Employment Service Providers are available in Thornhill?
+es_ajax,What Employment Service Providers are available in Ajax?
+es_alexandria,What Employment Service Providers are available in Alexandria?
+es_alliston,What Employment Service Providers are available in Alliston?
+es_amherstbrug,What Employment Service Providers are available in Amherstbrug?
+es_arnprior,What Employment Service Providers are available in Arnprior?
+es_atikokan,What Employment Service Providers are available in Atikokan?
+es_aylmer,What Employment Service Providers are available in Aylmer?
+es_bancroft,What Employment Service Providers are available in Bancroft?
+es_barrysbay,What Employment Service Providers are available in Barrys Bay?
+es_belleville,What Employment Service Providers are available in Belleville?
+es_hamilton,What Employment Service Providers are available in Hamilton?
+es_kanata,What Employment Service Providers are available in Kanata?
+es_kingston,What Employment Service Providers are available in Kingston?
+es_oshawa,What Employment Service Providers are available in Oshawa?
+es_ottawa,What Employment Service Providers are available in Ottawa?
+es_york,What Employment Service Providers are available in York?
+es_oakville,What Employment Service Providers are available in Oakville?

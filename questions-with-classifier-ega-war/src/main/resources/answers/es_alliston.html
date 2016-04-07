@@ -1,0 +1,22 @@
+<p>The following is a list of Employment Service provides with offices in Scarborough:</p>
+<table id="table" class="hidden">
+    <tr>
+        <th align="left">Service Provider Name</th>
+        <th align="left">Address</th>
+    </tr>
+</table>
+<script type="text/javascript" language="javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<script type="text/javascript" language="javascript">
+ $(document).ready(function() {
+              $.getJSON('https://api.namara.io/v0/data_sets/52fb5c79-a8bd-4f2e-825a-7d97bc47fcbe/data/en-3?api_key=0c702404b279ca4287d62b8aef8b9020f185febc584fff4893938d1f125e9312&where=site_city="ALEXANDRIA"', function(jd) {
+                  var j = 1;
+                  var txt = "";
+                  for (var i = 0, len = jd.length; i < len; i++) {
+                  	j = i + 1;
+                	txt += "<tr><td>"+jd[i].service_provider_name+"</td><td>"+jd[i].site_street_address+"</td></tr>";
+                  }
+                   $("#table").append(txt).removeClass("hidden");
+               });
+         });
+</script>
+
